@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+
+  db:
+    build:
+      dockerfile: ./docker/files/Dockerfile.postgres
+      context: "../"
+
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+
+    container_name: todo_db
+
+    ports:
+      - "5432:5432"
+
+    networks:
+      - todo
+
+networks:
+  todo:
+    driver: bridge
