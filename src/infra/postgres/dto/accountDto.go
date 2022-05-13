@@ -13,22 +13,22 @@ type accountDto struct {
 	Token    string `db:"account_token"`
 }
 
-func (a accountDto) ConvertToDomain() *domain.Account {
+func (d accountDto) ConvertToDomain() *domain.Account {
 	return domain.NewAccount(
-		a.Id,
-		a.Name,
-		a.Email,
-		a.Password,
-		a.Hash,
-		a.Token,
+		d.Id,
+		d.Name,
+		d.Email,
+		d.Password,
+		d.Hash,
+		d.Token,
 	)
 }
+
+type accountDtoManager struct{}
 
 func Account() *accountDtoManager {
 	return &accountDtoManager{}
 }
-
-type accountDtoManager struct{}
 
 func (accountDtoManager) Insert(account domain.Account) []interface{} {
 	return []interface{}{

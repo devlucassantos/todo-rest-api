@@ -6,9 +6,9 @@ import (
 )
 
 func loadAuthRoutes(group *echo.Group) {
-	authHandler := handlers.NewAuthHandler()
-
 	authGroup := group.Group("/auth")
+
+	authHandler := handlers.NewAuthHandler()
 
 	authGroup.POST("/signup", authHandler.SignUp)
 	authGroup.POST("/signin", authHandler.SignIn)

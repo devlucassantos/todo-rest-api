@@ -5,15 +5,16 @@ import (
 	"github.com/labstack/gommon/log"
 	"todo/src/app/api/endpoints/dto/request"
 	"todo/src/app/api/endpoints/dto/response"
+	"todo/src/app/api/endpoints/handlers/msgs"
 	"todo/src/core/domain"
-	"todo/src/core/errs/handlererrs"
-	iServices "todo/src/core/interfaces/services"
+	interfaces "todo/src/core/interfaces/services"
+	"todo/src/core/projecterrors/todoerrors"
 	"todo/src/core/services"
 	"todo/src/infra/postgres"
 )
 
 type Auth struct {
-	service iServices.IAuth
+	service interfaces.IAuth
 }
 
 func NewAuthHandler() *Auth {
@@ -24,22 +25,24 @@ func NewAuthHandler() *Auth {
 }
 
 func (h Auth) SignUp(ctx echo.Context) error {
-	var accountRequest request.Account
-	err := ctx.Bind(&accountRequest)
-	if err != nil {
+	var requestData request.Account
+	if err := ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		errMessage, invalidFields := handlererrs.GetAuthBindError(err)
-		return writeValidationErr(ctx, handlererrs.NewValidationErr(errMessage, invalidFields))
+		invalidFields := todoerrors.InvalidFields{}
+		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
+		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
 	}
-
-	account := domain.NewAccount(
+	account, validationError := domain.NewValidatedAccount(
 		-1,
-		accountRequest.Name,
-		accountRequest.Email,
-		accountRequest.Password,
+		requestData.Name,
+		requestData.Email,
+		requestData.Password,
 		"",
 		"",
 	)
+	if validationError != nil {
+		return writeValidationError(ctx, *validationError)
+	}
 
 	id, token, err := h.service.SignUp(*account)
 	if err != nil {
@@ -51,24 +54,22 @@ func (h Auth) SignUp(ctx echo.Context) error {
 		Id:          *id,
 		AccessToken: *token,
 	}
-
 	return writeCreatedResponse(ctx, authResponse)
 }
 
 func (h Auth) SignIn(ctx echo.Context) error {
-	var accountRequest request.Account
-	err := ctx.Bind(&accountRequest)
-	if err != nil {
+	var requestData request.Account
+	if err := ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		errMessage, invalidFields := handlererrs.GetAuthBindError(err)
-		return writeValidationErr(ctx, handlererrs.NewValidationErr(errMessage, invalidFields))
+		invalidFields := todoerrors.InvalidFields{}
+		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
+		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
 	}
-
 	account := domain.NewAccount(
 		-1,
 		"",
-		accountRequest.Email,
-		accountRequest.Password,
+		requestData.Email,
+		requestData.Password,
 		"",
 		"",
 	)
@@ -82,6 +83,5 @@ func (h Auth) SignIn(ctx echo.Context) error {
 	authResponse := response.Auth{
 		AccessToken: *token,
 	}
-
 	return writeCreatedResponse(ctx, authResponse)
 }

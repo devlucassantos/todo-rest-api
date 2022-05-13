@@ -1,7 +1,7 @@
 package response
 
-type GenericErrResponse struct {
-	Message       string                  `json:"error_message"`
+type GenericErrorResponse struct {
+	Message       string                  `json:"message"`
 	InvalidFields []InvalidFieldsResponse `json:"invalid_fields,omitempty"`
 	Conflicts     []string                `json:"conflicts,omitempty"`
 }

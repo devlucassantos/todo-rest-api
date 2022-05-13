@@ -11,7 +11,6 @@ func HashPassword(password string) (string, string, error) {
 	salt := generateSalt()
 	bytes := applySaltToPass(password, salt)
 	hashedPassword, err := bcrypt.GenerateFromPassword(bytes, bcrypt.DefaultCost)
-
 	if err != nil {
 		log.Error(err.Error())
 		return "", "", err
@@ -25,14 +24,13 @@ func ComparePassword(password string, salt string, hashedPwd string) bool {
 	if err != nil {
 		return false
 	}
-
-	hashPwd, err := decodedHashFromString(hashedPwd)
+	hashPassword, err := decodedHashFromString(hashedPwd)
 	if err != nil {
 		return false
 	}
-
 	bytes := applySaltToPass(password, hashSalt)
-	if err = bcrypt.CompareHashAndPassword(hashPwd, bytes); err != nil {
+
+	if bcrypt.CompareHashAndPassword(hashPassword, bytes) != nil {
 		return false
 	}
 

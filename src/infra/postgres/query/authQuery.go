@@ -8,18 +8,20 @@ func Auth() *authSqlManager {
 
 func (authSqlManager) Insert() string {
 	return `INSERT INTO user_account (id, name, email, password, hash, token)
-			VALUES (DEFAULT, UPPER($1), LOWER($2), $3, $4, $5) RETURNING id;`
+			VALUES (DEFAULT, $1, LOWER($2), $3, $4, $5) RETURNING id;`
 }
 
 func (authSqlManager) UpdateToken() string {
 	return `UPDATE user_account SET token = $1 WHERE id = $2`
 }
 
-func (authSqlManager) Select() *authSqlManager {
-	return &authSqlManager{}
+type authSelectSqlManager struct{}
+
+func (authSqlManager) Select() *authSelectSqlManager {
+	return &authSelectSqlManager{}
 }
 
-func (authSqlManager) ByEmail() string {
+func (authSelectSqlManager) ByEmail() string {
 	return `SELECT id	AS account_id,
 			name 		AS account_name,
 			email		AS account_email,

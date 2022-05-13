@@ -10,7 +10,7 @@ FROM '/mydata/fixtures/collection.csv'
 CSV HEADER;
 SELECT SETVAL('collection_id_seq', (SELECT MAX(id) FROM collection));
 
-COPY item (id, description, marked, user_id, collection_id)
-FROM '/mydata/fixtures/item.csv'
+COPY task (id, description, finished, user_id, collection_id)
+FROM '/mydata/fixtures/task.csv'
 CSV HEADER;
-SELECT SETVAL('item_id_seq', (SELECT MAX(id) FROM item));
+SELECT SETVAL('task_id_seq', (SELECT MAX(id) FROM task));

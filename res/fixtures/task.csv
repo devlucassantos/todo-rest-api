@@ -1,0 +1,9 @@
+id,description,finished,user_id,collection_id
+1,Study Math,true,1,1
+2,Study English,false,1,1
+3,Run,false,1,3
+4,Play soccer,false,1,3
+5,Refactor the code,true,1,2
+6,Build the new company website,true,1,2
+7,Go to the nutritionist,false,1,3
+8,Go to grandma's house,true,1,

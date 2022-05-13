@@ -6,7 +6,7 @@ import (
 )
 
 func loadEnvFile() {
-	err := godotenv.Load("config/.env")
+	err := godotenv.Load(".env")
 
 	if err != nil {
 		log.Fatal("Environment Variables File not found: ", err)

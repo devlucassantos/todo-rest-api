@@ -5,7 +5,11 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/gommon/log"
 	"os"
+	"regexp"
+	"strings"
 	"time"
+	"todo/src/core/domain/msgs"
+	"todo/src/core/projecterrors/todoerrors"
 )
 
 type Account struct {
@@ -17,51 +21,71 @@ type Account struct {
 	token    string
 }
 
+func NewValidatedAccount(id int, name, email, password, hash, token string) (*Account, *todoerrors.Validation) {
+	formattedEmail := strings.ToLower(strings.TrimSpace(email))
+	matched, err := regexp.MatchString("^[a-zA-Z\\d.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z\\d](?:[a-zA-Z\\d-]{0,61}[a-zA-Z\\d])?(?:\\.[a-zA-Z\\d](?:[a-zA-Z\\d-]{0,61}[a-zA-Z\\d])?)*$", formattedEmail)
+	if !matched || err != nil {
+		log.Error(err)
+		invalidFields := todoerrors.InvalidFields{}
+		invalidFields.AppendField(msgs.AccountEmail, msgs.InvalidAccountEmail)
+		return nil, todoerrors.NewValidationError(msgs.InvalidAccountDetails, invalidFields)
+	}
+
+	return &Account{
+		id:       id,
+		name:     strings.TrimSpace(name),
+		email:    formattedEmail,
+		password: password,
+		hash:     hash,
+		token:    token,
+	}, nil
+}
+
 func NewAccount(id int, name, email, password, hash, token string) *Account {
 	return &Account{
 		id:       id,
-		name:     name,
-		email:    email,
+		name:     strings.TrimSpace(name),
+		email:    strings.ToLower(strings.TrimSpace(email)),
 		password: password,
 		hash:     hash,
 		token:    token,
 	}
 }
 
-func (a Account) Id() int {
-	return a.id
+func (d Account) Id() int {
+	return d.id
 }
 
-func (a Account) Name() string {
-	return a.name
+func (d Account) Name() string {
+	return d.name
 }
 
-func (a Account) Email() string {
-	return a.email
+func (d Account) Email() string {
+	return d.email
 }
 
-func (a Account) Password() string {
-	return a.password
+func (d Account) Password() string {
+	return d.password
 }
 
-func (a *Account) SetPassword(password string) {
-	a.password = password
+func (d *Account) SetPassword(password string) {
+	d.password = password
 }
 
-func (a Account) Hash() string {
-	return a.hash
+func (d Account) Hash() string {
+	return d.hash
 }
 
-func (a *Account) SetHash(hash string) {
-	a.hash = hash
+func (d *Account) SetHash(hash string) {
+	d.hash = hash
 }
 
-func (a Account) Token() string {
-	return a.token
+func (d Account) Token() string {
+	return d.token
 }
 
-func (a *Account) GenerateToken() (string, error) {
-	claims := a.buildClaims()
+func (d *Account) GenerateToken() (string, error) {
+	claims := d.buildClaims()
 	secretKey := os.Getenv("SERVER_SECRET")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
@@ -71,12 +95,12 @@ func (a *Account) GenerateToken() (string, error) {
 		return "", err
 	}
 
-	a.token = signedToken
+	d.token = signedToken
 
 	return signedToken, nil
 }
 
-func (a Account) buildClaims() *jwt.MapClaims {
+func (d Account) buildClaims() *jwt.MapClaims {
 	now := time.Now().Unix()
 	exp := time.Now().Add(time.Minute * 60).Unix()
 
@@ -85,6 +109,6 @@ func (a Account) buildClaims() *jwt.MapClaims {
 		"iat":   now,
 		"typ":   "Bearer",
 		"iss":   fmt.Sprintf("https://%s:%s", os.Getenv("SERVER_ADDRESS"), os.Getenv("SERVER_PORT")),
-		"email": a.email,
+		"email": d.email,
 	}
 }

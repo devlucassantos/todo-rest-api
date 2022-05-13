@@ -22,17 +22,17 @@ CREATE TABLE collection
     CONSTRAINT collection_user_fk FOREIGN KEY (user_id) REFERENCES user_account (id)
 );
 
-CREATE TABLE item
+CREATE TABLE task
 (
     id          SERIAL      PRIMARY KEY,
     description VARCHAR(50) NOT NULL,
-    marked      BOOLEAN     NOT NULL,
+    finished    BOOLEAN     NOT NULL,
 
     user_id       INT NOT NULL,
     collection_id INT,
 
-    CONSTRAINT item_user_fk       FOREIGN KEY (user_id)       REFERENCES user_account (id),
-    CONSTRAINT item_collection_fk FOREIGN KEY (collection_id) REFERENCES collection   (id)
+    CONSTRAINT task_user_fk       FOREIGN KEY (user_id)       REFERENCES user_account (id),
+    CONSTRAINT task_collection_fk FOREIGN KEY (collection_id) REFERENCES collection   (id)
 );
 
 CREATE DATABASE todo_db_test WITH TEMPLATE todo_db OWNER postgres;
