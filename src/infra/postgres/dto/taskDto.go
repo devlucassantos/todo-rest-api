@@ -22,7 +22,7 @@ func Task() *taskDtoManager {
 	return &taskDtoManager{}
 }
 
-func (taskDtoManager) Insert(task domain.Task) []interface{} {
+func (taskDtoManager) Insert(task domain.Task, userId int) []interface{} {
 	var collection *int
 	collectionId := task.Collection().Id()
 	if collectionId != 0 {
@@ -33,10 +33,11 @@ func (taskDtoManager) Insert(task domain.Task) []interface{} {
 		task.Description(),
 		task.Finished(),
 		collection,
+		userId,
 	}
 }
 
-func (taskDtoManager) Update(task domain.Task) []interface{} {
+func (taskDtoManager) Update(task domain.Task, userId int) []interface{} {
 	var collection *int
 	collectionId := task.Collection().Id()
 	if collectionId != 0 {
@@ -48,6 +49,7 @@ func (taskDtoManager) Update(task domain.Task) []interface{} {
 		task.Finished(),
 		collection,
 		task.Id(),
+		userId,
 	}
 }
 

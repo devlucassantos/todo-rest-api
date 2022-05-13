@@ -11,7 +11,13 @@ func loadCollectionRoutes(group *echo.Group) {
 	authMiddleware := middleware.NewAuthMiddleware()
 	collectionGroup.Use(authMiddleware.Authorize)
 
+	collectionHandler := handlers.NewCollectionHandler()
 	taskHandler := handlers.NewTaskHandler()
 
+	collectionGroup.POST("", collectionHandler.Create)
+	collectionGroup.PUT("/:collectionId", collectionHandler.Update)
+	collectionGroup.DELETE("/:collectionId", collectionHandler.Delete)
+	collectionGroup.GET("", collectionHandler.FindAll)
+	collectionGroup.GET("/:collectionId", collectionHandler.FindById)
 	collectionGroup.GET("/:collectionId/tasks", taskHandler.FindByCollectionId)
 }

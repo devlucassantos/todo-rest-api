@@ -30,8 +30,7 @@ func (r Task) Create(task domain.Task, userId int) (int, error) {
 	defer r.closeConnection(connection)
 
 	var id int
-	insertData := append(dto.Task().Insert(task), userId)
-	err = connection.QueryRow(query.Task().Insert(), insertData...).Scan(&id)
+	err = connection.QueryRow(query.Task().Insert(), dto.Task().Insert(task, userId)...).Scan(&id)
 	if err != nil {
 		log.Error(err)
 		return -1, r.handlePostgresError(err)
@@ -48,8 +47,7 @@ func (r Task) Update(task domain.Task, userId int) error {
 	}
 	defer r.closeConnection(connection)
 
-	insertData := append(dto.Task().Update(task), userId)
-	result, err := connection.Exec(query.Task().Update(), insertData...)
+	result, err := connection.Exec(query.Task().Update(), dto.Task().Update(task, userId)...)
 	if err != nil {
 		log.Error(err)
 		return r.handlePostgresError(err)
@@ -153,12 +151,10 @@ func (r Task) FindByCollectionId(collectionId, userId int) ([]domain.Task, error
 func (r Task) handlePostgresError(err error) error {
 	errMessage := err.Error()
 
-	if strings.Contains(errMessage, "unique") {
-		return repositoryerrors.NewDuplicatedError(msgs.DuplicatedCredentials, err)
-	} else if strings.Contains(errMessage, "task_collection_fk") {
+	if strings.Contains(errMessage, "task_collection_fk") {
 		return repositoryerrors.NewDependencyError(msgs.CollectionNotFound, err, msgs.Collection)
 	} else if strings.Contains(errMessage, "sql: no rows in result set") {
-		return repositoryerrors.NewNotFoundError(msgs.InvalidAccountCredentials, err)
+		return repositoryerrors.NewNotFoundError(msgs.TaskNotFound, err)
 	}
 
 	return repositoryerrors.NewUnknownError(err)
