@@ -56,7 +56,7 @@ func (r Auth) SignIn(account domain.Account) (string, error) {
 	if !isValid {
 		return "", repositoryerrors.NewUnauthorizedError(msgs.InvalidAccountCredentials, err)
 	}
-	token, err := account.GenerateToken()
+	token, err := destination.ConvertToDomain().GenerateToken()
 	if err != nil {
 		log.Error(err)
 		return "", repositoryerrors.NewUnknownError(err)
@@ -80,7 +80,7 @@ func (r Auth) handlePostgresError(err error) error {
 	errMessage := err.Error()
 
 	if strings.Contains(errMessage, "unique") {
-		return repositoryerrors.NewDuplicatedError(msgs.DuplicatedCredentials, err)
+		return repositoryerrors.NewDuplicatedError(msgs.DuplicatedCredentials, err, msgs.Email)
 	} else if strings.Contains(errMessage, "sql: no rows in result set") {
 		return repositoryerrors.NewUnauthorizedError(msgs.InvalidAccountCredentials, err)
 	}

@@ -1,7 +1,5 @@
 FROM postgres:13.2
 
-COPY . /mydata
-
 WORKDIR /mydata
 
 COPY ./fixtures ./fixtures

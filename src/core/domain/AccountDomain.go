@@ -109,6 +109,7 @@ func (d Account) buildClaims() *jwt.MapClaims {
 		"iat":   now,
 		"typ":   "Bearer",
 		"iss":   fmt.Sprintf("https://%s:%s", os.Getenv("SERVER_ADDRESS"), os.Getenv("SERVER_PORT")),
+		"id":    d.id,
 		"email": d.email,
 	}
 }

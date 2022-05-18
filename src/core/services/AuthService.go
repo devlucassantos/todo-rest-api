@@ -38,6 +38,14 @@ func (s Auth) SignUp(account domain.Account) (*int, *string, error) {
 		return nil, nil, todoerrors.ConvertRepositoryErrorToServiceError(err, s.SignUp)
 	}
 
+	account = *domain.NewAccount(
+		id,
+		account.Name(),
+		account.Email(),
+		account.Password(),
+		account.Hash(),
+		account.Token(),
+	)
 	token, err := account.GenerateToken()
 	if err != nil {
 		log.Error(err)

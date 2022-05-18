@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  server:
+    container_name: todo-rest-api
+    tty: true
+    build:
+      dockerfile: Dockerfile-go
+      context: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+    networks:
+      - todo
+
+  database:
+    container_name: todo-database
+    build:
+      dockerfile: Dockerfile-postgres
+      context: .
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+    ports:
+      - "5432:5432"
+    networks:
+      - todo
+
+networks:
+  todo:
+    driver: bridge

@@ -7,6 +7,7 @@ func LoadRoutes() *echo.Echo {
 
 	apiGroup := router.Group("/api")
 	loadAuthRoutes(apiGroup)
+	loadDocumentationRoutes(apiGroup)
 
 	userGroup := apiGroup.Group("/user/:userId")
 	loadTaskRoutes(userGroup)

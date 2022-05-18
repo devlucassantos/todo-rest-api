@@ -1,21 +1,16 @@
 version: '3'
 
 services:
-
   db:
+    container_name: todo-database-dev
     build:
-      dockerfile: ./docker/files/Dockerfile.postgres
+      dockerfile: ./docker/Dockerfile
       context: "../"
-
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=12345678
-
-    container_name: todo_db
-
     ports:
-      - "5433:5432"
-
+      - "5432:5432"
     networks:
       - todo
 

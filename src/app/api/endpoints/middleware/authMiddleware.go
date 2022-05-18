@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -20,13 +21,14 @@ func NewAuthMiddleware() *authMiddleware {
 func (m authMiddleware) Authorize(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		authHeader := ctx.Request().Header.Get("Authorization")
+		userId := ctx.Param("userId")
 		token, err := m.getToken(authHeader)
 		if err != nil {
 			log.Error(err)
 			return handlers.WriteUnauthorizedError(ctx, err.Error())
 		}
 
-		if !m.isValidToken(token) {
+		if !m.isValidToken(token, userId) {
 			return handlers.WriteUnauthorizedError(ctx, msgs.UnauthorizedError)
 		}
 
@@ -48,7 +50,7 @@ func (m authMiddleware) getToken(authHeader string) (string, error) {
 	return token, nil
 }
 
-func (m authMiddleware) isValidToken(token string) bool {
+func (m authMiddleware) isValidToken(token, userId string) bool {
 	secretKey := os.Getenv("SERVER_SECRET")
 	newToken, err := jwt.Parse(
 		token,
@@ -62,6 +64,11 @@ func (m authMiddleware) isValidToken(token string) bool {
 	}
 
 	if !newToken.Valid {
+		return false
+	}
+
+	claims := newToken.Claims.(jwt.MapClaims)
+	if fmt.Sprint(claims["id"]) != userId {
 		return false
 	}
 

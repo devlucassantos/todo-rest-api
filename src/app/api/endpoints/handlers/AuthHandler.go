@@ -24,6 +24,25 @@ func NewAuthHandler() *Auth {
 	return &Auth{service}
 }
 
+// SignUp
+// @ID 			SignUp
+// @Summary		User Sign Up
+// @Tags 		Authentication
+// @Description Route that allows you to register a user in the system. To register a user it is necessary to inform the following data in the body of the request:
+// @Description |   Name   |  Type  |   Required  | Description		|
+// @Description |----------|--------|-------------|-----------------|
+// @Description | name     | string |      x      | Real user name  |
+// @Description | email    | string |      x      | User email      |
+// @Description | password | string |      x      | User password   |
+// @Accept 		json
+// @Produce 	json
+// @Param 		authJson 		body 		request.Account            true            "JSON responsible for sending all user registration data to the server"
+// @Success 	201 			{object} 	response.SwaggerSignUpResponse 			   "User successfully registered"
+// @Failure 	400 			{object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
+// @Failure 	409 			{object} 	response.SwaggerConflictErrorResponse 	   "The user tried to register with the email of an existing user"
+// @Failure 	422 			{object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
+// @Failure 	500 			{object} 	response.SwaggerGenericErrorResponse 	   "An unexpected server error has occurred"
+// @Router 		/auth/signup 	[post]
 func (h Auth) SignUp(ctx echo.Context) error {
 	var requestData request.Account
 	if err := ctx.Bind(&requestData); err != nil {
@@ -57,6 +76,23 @@ func (h Auth) SignUp(ctx echo.Context) error {
 	return writeCreatedResponse(ctx, authResponse)
 }
 
+// SignIn
+// @ID 			SignIn
+// @Summary		User Sign In
+// @Tags 		Authentication
+// @Description Route that allows connecting the user to the system through their registration data. To connect a user it is necessary to inform the following data in the body of the request:
+// @Description |   Name   |  Type  |   Required  | Description		|
+// @Description |----------|--------|-------------|-----------------|
+// @Description | email    | string |      x      | User email      |
+// @Description | password | string |      x      | User password   |
+// @Accept 		json
+// @Produce 	json
+// @Param 		authJson 	 body 		request.Account            true            "JSON responsible for sending all user sign in data to the server"
+// @Success 	201 		 {object} 	response.SwaggerLoginResponse 			   "User successfully signed in"
+// @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
+// @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
+// @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
+// @Router 		/auth/signin [post]
 func (h Auth) SignIn(ctx echo.Context) error {
 	var requestData request.Account
 	if err := ctx.Bind(&requestData); err != nil {

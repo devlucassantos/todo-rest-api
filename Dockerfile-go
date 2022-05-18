@@ -1,0 +1,14 @@
+FROM golang:alpine
+
+WORKDIR /
+
+COPY go.mod /
+COPY go.sum /
+COPY main.go /
+COPY docs /docs
+COPY src /src
+COPY .env /.env
+
+RUN go build -o /build
+
+CMD ["/build"]

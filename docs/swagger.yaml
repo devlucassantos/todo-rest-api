@@ -1,0 +1,790 @@
+basePath: /api
+definitions:
+  request.Account:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+      name:
+        example: Example Name
+        type: string
+      password:
+        example: ex@mplePassw0rd
+        type: string
+    type: object
+  request.Collection:
+    properties:
+      name:
+        example: Collection example
+        type: string
+    type: object
+  request.Task:
+    properties:
+      collection_id:
+        example: 1
+        type: integer
+      description:
+        example: Task example
+        type: string
+      finished:
+        example: false
+        type: boolean
+    type: object
+  response.SwaggerCollectionResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Collection example
+        type: string
+    type: object
+  response.SwaggerConflictErrorResponse:
+    properties:
+      conflicts:
+        example:
+        - Field example
+        items:
+          type: string
+        type: array
+      error_msg:
+        example: It is not possible to perform the operation because there are conflicting
+          and/or duplicate data.
+        type: string
+    type: object
+  response.SwaggerGenericErrorResponse:
+    properties:
+      error_msg:
+        example: Oops! An unexpected error has occurred.
+        type: string
+    type: object
+  response.SwaggerIdResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+    type: object
+  response.SwaggerInvalidField:
+    properties:
+      description:
+        example: Description example
+        type: string
+      name:
+        example: Field example
+        type: string
+    type: object
+  response.SwaggerLoginResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...
+        type: string
+    type: object
+  response.SwaggerNotFoundErrorResponse:
+    properties:
+      error_msg:
+        example: Not Found
+        type: string
+    type: object
+  response.SwaggerSignUpResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...
+        type: string
+      id:
+        example: 1
+        type: integer
+    type: object
+  response.SwaggerTaskResponse:
+    properties:
+      collection:
+        $ref: '#/definitions/response.SwaggerCollectionResponse'
+      description:
+        example: Description example
+        type: string
+      finished:
+        example: false
+        type: boolean
+      id:
+        example: 1
+        type: integer
+    type: object
+  response.SwaggerUnauthorizedResponse:
+    properties:
+      message:
+        example: Oops! You are not authorized.
+        type: string
+    type: object
+  response.SwaggerValidationErrorResponse:
+    properties:
+      error_msg:
+        example: Some of the data entered is invalid.
+        type: string
+      invalid_fields:
+        items:
+          $ref: '#/definitions/response.SwaggerInvalidField'
+        type: array
+    type: object
+host: localhost:8000
+info:
+  contact:
+    name: Lucas Santos
+    url: https://github.com/devlucassantos
+  description: This repository is an example of an API made in Go with the To Do List
+    theme.
+  title: To Do List API
+  version: 1.0.0
+paths:
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: "Route that allows connecting the user to the system through their
+        registration data. To connect a user it is necessary to inform the following
+        data in the body of the request:\n|   Name   |  Type  |   Required  | Description\t\t|\n|----------|--------|-------------|-----------------|\n|
+        email    | string |      x      | User email      |\n| password | string |
+        \     x      | User password   |"
+      operationId: SignIn
+      parameters:
+      - description: JSON responsible for sending all user sign in data to the server
+        in: body
+        name: authJson
+        required: true
+        schema:
+          $ref: '#/definitions/request.Account'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully signed in
+          schema:
+            $ref: '#/definitions/response.SwaggerLoginResponse'
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      summary: User Sign In
+      tags:
+      - Authentication
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: "Route that allows you to register a user in the system. To register
+        a user it is necessary to inform the following data in the body of the request:\n|
+        \  Name   |  Type  |   Required  | Description\t\t|\n|----------|--------|-------------|-----------------|\n|
+        name     | string |      x      | Real user name  |\n| email    | string |
+        \     x      | User email      |\n| password | string |      x      | User
+        password   |"
+      operationId: SignUp
+      parameters:
+      - description: JSON responsible for sending all user registration data to the
+          server
+        in: body
+        name: authJson
+        required: true
+        schema:
+          $ref: '#/definitions/request.Account'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully registered
+          schema:
+            $ref: '#/definitions/response.SwaggerSignUpResponse'
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "409":
+          description: The user tried to register with the email of an existing user
+          schema:
+            $ref: '#/definitions/response.SwaggerConflictErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      summary: User Sign Up
+      tags:
+      - Authentication
+  /user/{userId}/collection:
+    get:
+      description: Route that allows searching all user collections in the system
+      operationId: FindAll
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful request
+          schema:
+            items:
+              $ref: '#/definitions/response.SwaggerCollectionResponse'
+            type: array
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Lists all user collections
+      tags:
+      - Collection
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Route that allows registering a collection in the system. To register a collection it is necessary to inform the following data in the body of the request:
+        |   Name   |  Type  |   Required  | Description      |
+        |----------|--------|-------------|------------------|
+        |   name   | string |      x      | Collection name |
+      operationId: Create
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: JSON responsible for sending all collection registration data
+          to the database
+        in: body
+        name: authJson
+        required: true
+        schema:
+          $ref: '#/definitions/request.Collection'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Collection successfully registered
+          schema:
+            $ref: '#/definitions/response.SwaggerIdResponse'
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Create a collection
+      tags:
+      - Collection
+  /user/{userId}/collection/{collectionId}:
+    delete:
+      description: Route that allows deleting a collection registered in the system
+      operationId: Delete
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 1
+        description: Collection ID
+        in: path
+        name: collectionId
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: Collection successfully deleted
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Delete a collection
+      tags:
+      - Collection
+    get:
+      description: Route that allows searching a collection registered in the system
+        by ID
+      operationId: FindById
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 1
+        description: Collection ID
+        in: path
+        name: collectionId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful request
+          schema:
+            $ref: '#/definitions/response.SwaggerCollectionResponse'
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Search a collection's data by ID
+      tags:
+      - Collection
+    put:
+      consumes:
+      - application/json
+      description: "Route that allows editing a collection in the system. To edit
+        a collection it is necessary to inform the following data:\n|   Name   |  Type
+        \ |   Required  | Description\t     |\n|----------|--------|-------------|------------------|\n|
+        \  name   | string |      x      | Collection name  |"
+      operationId: Update
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 1
+        description: Collection ID
+        in: path
+        name: collectionId
+        required: true
+        type: integer
+      - description: JSON responsible for sending the data needed to update the collection
+          in the database
+        in: body
+        name: authJson
+        required: true
+        schema:
+          $ref: '#/definitions/request.Collection'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Collection successfully edited
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Update a collection
+      tags:
+      - Collection
+  /user/{userId}/collection/{collectionId}/tasks:
+    get:
+      description: Route that allows searching all tasks registered in the system
+        by collection ID
+      operationId: FindByCollectionId
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 1
+        description: Collection ID
+        in: path
+        name: collectionId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful request
+          schema:
+            $ref: '#/definitions/response.SwaggerTaskResponse'
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Search all tasks by collection ID
+      tags:
+      - Collection
+  /user/{userId}/task:
+    get:
+      description: Route that allows searching all user tasks in the system
+      operationId: FindAll
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful request
+          schema:
+            items:
+              $ref: '#/definitions/response.SwaggerTaskResponse'
+            type: array
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Lists all user tasks
+      tags:
+      - Task
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Route that allows registering a task in the system. To register a task it is necessary to inform the following data in the body of the request:
+        |      Name     |  Type  |   Required  |                    Description                    |
+        |---------------|--------|-------------|---------------------------------------------------|
+        | description   | string |             | Task description                                  |
+        | finished      |  bool  |             | If the task has been completed                    |
+        | collection_id |  int   |             | ID of the collection to which the task is related |
+      operationId: Create
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: JSON responsible for sending all task registration data to the
+          database
+        in: body
+        name: authJson
+        required: true
+        schema:
+          $ref: '#/definitions/request.Task'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Task successfully registered
+          schema:
+            $ref: '#/definitions/response.SwaggerIdResponse'
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Create a task
+      tags:
+      - Task
+  /user/{userId}/task/{taskId}:
+    delete:
+      description: Route that allows deleting a task registered in the system
+      operationId: Delete
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 1
+        description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: Task successfully deleted
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Delete a task
+      tags:
+      - Task
+    get:
+      description: Route that allows searching a task registered in the system by
+        ID
+      operationId: FindById
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 1
+        description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful request
+          schema:
+            $ref: '#/definitions/response.SwaggerTaskResponse'
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Search a task's data by ID
+      tags:
+      - Task
+    put:
+      consumes:
+      - application/json
+      description: |-
+        Route that allows editing a task in the system. To edit a task it is necessary to inform the following data:
+        |      Name     |  Type  |   Required  |                    Description                    |
+        |---------------|--------|-------------|---------------------------------------------------|
+        | description   | string |             | Task description                                  |
+        | finished      |  bool  |             | If the task has been completed                    |
+        | collection_id |  int   |             | ID of the collection to which the task is related |
+      operationId: Update
+      parameters:
+      - default: 1
+        description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 1
+        description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: integer
+      - description: JSON responsible for sending the data needed to update the task
+          in the database
+        in: body
+        name: authJson
+        required: true
+        schema:
+          $ref: '#/definitions/request.Task'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Task successfully edited
+        "400":
+          description: The user has made a bad request
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to make this request
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "404":
+          description: The user has requested a non-existent resource
+          schema:
+            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
+        "422":
+          description: Some entered data could not be processed because it is not
+            valid
+          schema:
+            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "500":
+          description: An unexpected server error has occurred
+          schema:
+            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: Update a task
+      tags:
+      - Task
+securityDefinitions:
+  bearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
