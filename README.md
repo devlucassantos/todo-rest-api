@@ -48,3 +48,12 @@ chosen values for address and port):
 ```
 localhost:8000/api/documentation/index.html
 ```
+
+Note that to use all the routes you will need to authenticate to the API, which is simple, see the image below and
+following the steps described here, see how you can authenticate yourself to the API. Look for the **Sign Up** and
+**Sign In** routes, they will be the first. In these routes you will find all the information you need to register or
+login to the system and after that you will receive in the returned JSON body your `access_token`. The access token
+value must be copied and pasted into the field that appears when you click on the **Authorize** button above all routes
+on the left side, as you can see in the image below.
+
+![todo-rest-api](https://user-images.githubusercontent.com/89457923/169172172-1c112bf0-14d0-43c2-89d9-ba52c8391ac2.png)
