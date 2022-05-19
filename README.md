@@ -9,7 +9,7 @@ problems or suggesting new features. If this project is useful to you, consider 
 
 ## The Beginning of the Journey
 
-### Step 1 - Way
+### Way
 
 You will have two ways to take advantage of all the features of the repository. The first way is the simplest, you just
 need to download this repository and have [Docker](https://www.docker.com/get-started/) installed on your machine.
@@ -32,13 +32,7 @@ $ cd ../..
 $ go run main.go
 ```
 
-### Step 2 - Settings
-
-You can easily modify some API settings, such as where your server can be located or which Postgres database it will
-access, for example. For that, just modify the values present in the [environment configuration file](.env) and
-everything will be as you defined.
-
-### Step 3 - Map
+### Map
 
 You will be able to see how it works and test the execution of all the API routes using only your browser. If you are
 using the project's default values for `SERVER_ADDRESS` and `SERVER_PORT`, just type the following address in your
@@ -57,3 +51,9 @@ value must be copied and pasted into the field that appears when you click on th
 on the left side, as you can see in the image below.
 
 ![todo-rest-api](https://user-images.githubusercontent.com/89457923/169172172-1c112bf0-14d0-43c2-89d9-ba52c8391ac2.png)
+
+### Settings
+
+You can easily modify some API settings, such as where your server can be located or which Postgres database it will
+access, for example. For that, just modify the values present in the [environment configuration file](.env) and
+everything will be as you defined.
