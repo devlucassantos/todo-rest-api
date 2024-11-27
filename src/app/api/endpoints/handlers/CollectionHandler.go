@@ -25,7 +25,7 @@ func NewCollectionHandler() *Collection {
 }
 
 // Create
-// @ID 			Create
+// @ID 			CreateCollection
 // @Summary		Create a collection
 // @Tags 		Collection
 // @Description Route that allows registering a collection in the system. To register a collection it is necessary to inform the following data in the body of the request:
@@ -35,11 +35,12 @@ func NewCollectionHandler() *Collection {
 // @Accept 		json
 // @Produce 	json
 // @Security	bearerAuth
-// @Param 	    userId       path       int                          true          "User ID"    default(1)
-// @Param 		authJson 	 body 		request.Collection           true          "JSON responsible for sending all collection registration data to the database"
+// @Param 	    userId       path       int                                true    "User ID"    default(1)
+// @Param 		authJson 	 body 		request.SwaggerCollectionRequest   true    "JSON responsible for sending all collection registration data to the database"
 // @Success 	201 		 {object} 	response.SwaggerIdResponse                 "Collection successfully registered"
 // @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403          {object}   response.SwaggerForbiddenResponse   	   "The user does not have access to this information"
 // @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/collection  [post]
@@ -78,7 +79,7 @@ func (h Collection) Create(ctx echo.Context) error {
 }
 
 // Update
-// @ID 			Update
+// @ID 			UpdateCollection
 // @Summary		Update a collection
 // @Tags 		Collection
 // @Description Route that allows editing a collection in the system. To edit a collection it is necessary to inform the following data:
@@ -88,12 +89,13 @@ func (h Collection) Create(ctx echo.Context) error {
 // @Accept 		json
 // @Produce 	json
 // @Security	bearerAuth
-// @Param 	    userId          path        int                          true          "User ID"          default(1)
-// @Param 	    collectionId    path        int                          true          "Collection ID"    default(1)
-// @Param 		authJson 	    body 	    request.Collection           true          "JSON responsible for sending the data needed to update the collection in the database"
+// @Param 	    userId          path        int                                 true   "User ID"          default(1)
+// @Param 	    collectionId    path        int                                 true   "Collection ID"    default(1)
+// @Param 		authJson 	    body 	    request.SwaggerCollectionRequest    true   "JSON responsible for sending the data needed to update the collection in the database"
 // @Success 	204             {object}    nil 									   "Collection successfully edited"
 // @Failure 	400             {object}    response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401             {object}    response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403             {object}    response.SwaggerForbiddenResponse   	   "The user does not have access to this information"
 // @Failure 	404             {object}    response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422             {object}    response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500             {object}    response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -139,7 +141,7 @@ func (h Collection) Update(ctx echo.Context) error {
 }
 
 // Delete
-// @ID 			Delete
+// @ID 			DeleteCollection
 // @Summary		Delete a collection
 // @Tags 		Collection
 // @Description Route that allows deleting a collection registered in the system
@@ -149,6 +151,7 @@ func (h Collection) Update(ctx echo.Context) error {
 // @Success 	204 		 {object} 	nil                                        "Collection successfully deleted"
 // @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403          {object}   response.SwaggerForbiddenResponse   	   "The user does not have access to this information"
 // @Failure 	404 		 {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -179,7 +182,7 @@ func (h Collection) Delete(ctx echo.Context) error {
 }
 
 // FindAll
-// @ID 			FindAll
+// @ID 			FindAllCollections
 // @Summary 	Lists all user collections
 // @Tags 		Collection
 // @Description Route that allows searching all user collections in the system
@@ -188,7 +191,8 @@ func (h Collection) Delete(ctx echo.Context) error {
 // @Param 		userId    path      int                 true                   "User ID"    default(1)
 // @Success 	200       {array} 	response.SwaggerCollectionResponse         "Successful request"
 // @Failure 	400       {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
-// @Failure 	401       {object} 	response.SwaggerUnauthorizedResponse       "The user is not authorized to make this request"
+// @Failure 	401       {object}  response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403       {object} 	response.SwaggerForbiddenResponse          "The user does not have access to this information"
 // @Failure 	404       {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422       {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500       {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -216,7 +220,7 @@ func (h Collection) FindAll(ctx echo.Context) error {
 }
 
 // FindById
-// @ID 			FindById
+// @ID 			FindByCollectionId
 // @Summary 	Search a collection's data by ID
 // @Tags 		Collection
 // @Description Route that allows searching a collection registered in the system by ID
@@ -227,6 +231,7 @@ func (h Collection) FindAll(ctx echo.Context) error {
 // @Success 	200          {object}    response.SwaggerCollectionResponse         "Successful request"
 // @Failure 	400 		 {object} 	 response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401          {object}    response.SwaggerUnauthorizedResponse 	    "The user is not authorized to make this request"
+// @Failure 	403          {object}    response.SwaggerForbiddenResponse   	    "The user does not have access to this information"
 // @Failure 	404 		 {object} 	 response.SwaggerNotFoundErrorResponse 	    "The user has requested a non-existent resource"
 // @Failure 	422 		 {object} 	 response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500 		 {object} 	 response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -253,6 +258,5 @@ func (h Collection) FindById(ctx echo.Context) error {
 		return handleServiceErrors(ctx, err)
 	}
 
-	collectionResponse := response.NewCollection(*collection)
-	return writeAcceptResponse(ctx, collectionResponse)
+	return writeAcceptResponse(ctx, response.NewCollection(*collection))
 }

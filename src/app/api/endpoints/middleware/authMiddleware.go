@@ -28,8 +28,25 @@ func (m authMiddleware) Authorize(next echo.HandlerFunc) echo.HandlerFunc {
 			return handlers.WriteUnauthorizedError(ctx, err.Error())
 		}
 
-		if !m.isValidToken(token, userId) {
+		secretKey := os.Getenv("SERVER_SECRET")
+		newToken, err := jwt.Parse(
+			token,
+			func(token *jwt.Token) (interface{}, error) {
+				return []byte(secretKey), nil
+			},
+		)
+		if err != nil {
+			log.Error(err)
 			return handlers.WriteUnauthorizedError(ctx, msgs.UnauthorizedError)
+		}
+
+		if !newToken.Valid {
+			return handlers.WriteUnauthorizedError(ctx, msgs.UnauthorizedError)
+		}
+
+		claims := newToken.Claims.(jwt.MapClaims)
+		if fmt.Sprint(claims["id"]) != userId {
+			return handlers.WriteForbiddenError(ctx, msgs.ForbiddenError)
 		}
 
 		return next(ctx)
@@ -48,29 +65,4 @@ func (m authMiddleware) getToken(authHeader string) (string, error) {
 	}
 
 	return token, nil
-}
-
-func (m authMiddleware) isValidToken(token, userId string) bool {
-	secretKey := os.Getenv("SERVER_SECRET")
-	newToken, err := jwt.Parse(
-		token,
-		func(token *jwt.Token) (interface{}, error) {
-			return []byte(secretKey), nil
-		},
-	)
-	if err != nil {
-		log.Error(err)
-		return false
-	}
-
-	if !newToken.Valid {
-		return false
-	}
-
-	claims := newToken.Claims.(jwt.MapClaims)
-	if fmt.Sprint(claims["id"]) != userId {
-		return false
-	}
-
-	return true
 }

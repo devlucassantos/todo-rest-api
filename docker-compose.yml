@@ -1,32 +1,39 @@
-version: '3'
-
 services:
-  server:
-    container_name: todo-rest-api
-    tty: true
-    build:
-      dockerfile: Dockerfile-go
-      context: .
-    ports:
-      - "8000:8000"
-    depends_on:
-      - database
-    networks:
-      - todo
+    todo_rest_api:
+        container_name: todo_rest_api
+        build:
+            context: .
+            dockerfile: Dockerfile-go
+        ports:
+            - "8000:8000"
+        depends_on:
+            - todo_postgresql
+        networks:
+            - todo_network
+    todo_postgresql:
+        container_name: todo_postgresql
+        build:
+            context: .
+            dockerfile: Dockerfile-postgres
+            args:
+                POSTGRES_DB: todo_db
+                POSTGRES_SERVICE_USER: todo_service
+                POSTGRES_SERVICE_USER_PASSWORD: todo_service_password
+#        volumes: # Uncomment these lines if you want to persist the data even after deleting the containers
+#            - todo_data:/var/lib/postgresql/data # Uncomment these lines if you want to persist the data even after deleting the containers
+        restart: always
+        environment:
+            POSTGRES_DB: todo_db
+            POSTGRES_USER: todo_user
+            POSTGRES_PASSWORD: todo_password
+        ports:
+            - "5433:5432"
+        networks:
+            - todo_network
 
-  database:
-    container_name: todo-database
-    build:
-      dockerfile: Dockerfile-postgres
-      context: .
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=12345678
-    ports:
-      - "5432:5432"
-    networks:
-      - todo
+#volumes: # Uncomment these lines if you want to persist the data even after deleting the container
+#    todo_data: # Uncomment these lines if you want to persist the data even after deleting the container
 
 networks:
-  todo:
-    driver: bridge
+    todo_network:
+        driver: bridge

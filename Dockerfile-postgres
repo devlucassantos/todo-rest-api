@@ -1,7 +1,14 @@
-FROM postgres:alpine
+FROM postgres
 
-WORKDIR /
+COPY res/sql/create_service_user.sql /docker-entrypoint-initdb.d
+COPY res/sql/init_db.sql /docker-entrypoint-initdb.d
+
+ARG POSTGRES_DB=$POSTGRES_DB
+ARG POSTGRES_SERVICE_USER=$POSTGRES_SERVICE_USER
+ARG POSTGRES_SERVICE_USER_PASSWORD=$POSTGRES_SERVICE_USER_PASSWORD
+
+RUN sed -i -e 's/$POSTGRES_DB/'"$POSTGRES_DB"'/g' \
+    -e 's/$POSTGRES_SERVICE_USER_PASSWORD/'"$POSTGRES_SERVICE_USER_PASSWORD"'/g' \
+    -e 's/$POSTGRES_SERVICE_USER/'"$POSTGRES_SERVICE_USER"'/g' /docker-entrypoint-initdb.d/create_service_user.sql
 
 EXPOSE 5432
-
-ADD ./res/sql/init_db.sql /docker-entrypoint-initdb.d

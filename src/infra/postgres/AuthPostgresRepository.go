@@ -1,8 +1,9 @@
 package postgres
 
 import (
+	"encoding/hex"
+	"golang.org/x/crypto/bcrypt"
 	"strings"
-	"todo/src/common/crypto"
 	"todo/src/core/domain"
 	"todo/src/core/projecterrors/repositoryerrors"
 	"todo/src/infra/postgres/dto"
@@ -21,11 +22,11 @@ func NewAuthPostgresRepository(connectionManager iConnectionManager) *Auth {
 	return &Auth{connectionManager}
 }
 
-func (r Auth) SignUp(account domain.Account) (int, error) {
+func (r Auth) SignUp(account domain.Account) (*domain.Account, error) {
 	connection, err := r.getConnection()
 	if err != nil {
 		log.Error(err)
-		return -1, repositoryerrors.NewServiceUnavailableError(msgs.ConnectionError, err)
+		return nil, repositoryerrors.NewServiceUnavailableError(msgs.ConnectionError, err)
 	}
 	defer r.closeConnection(connection)
 
@@ -33,47 +34,55 @@ func (r Auth) SignUp(account domain.Account) (int, error) {
 	err = connection.QueryRow(query.Auth().Insert(), dto.Account().Insert(account)...).Scan(&id)
 	if err != nil {
 		log.Error(err)
-		return -1, r.handlePostgresError(err)
+		return nil, r.handlePostgresError(err)
 	}
 
-	return id, nil
+	account = *domain.NewAccount(
+		id,
+		account.Name(),
+		account.Email(),
+		"",
+		"",
+	)
+
+	return &account, nil
 }
 
-func (r Auth) SignIn(account domain.Account) (string, error) {
+func (r Auth) SignIn(account domain.Account) (*domain.Account, error) {
 	conn, err := r.getConnection()
 	if err != nil {
 		log.Error(err)
-		return "", repositoryerrors.NewServiceUnavailableError(msgs.ConnectionError, err)
+		return nil, repositoryerrors.NewServiceUnavailableError(msgs.ConnectionError, err)
 	}
 	defer r.closeConnection(conn)
 
-	destination := dto.Account().Select().ByEmail()
-	err = conn.Get(&destination, query.Auth().Select().ByEmail(), account.Email())
+	accountDto := dto.Account().Select().ByEmail()
+	err = conn.Get(&accountDto, query.Auth().Select().ByEmail(), account.Email())
 	if err != nil {
-		return "", repositoryerrors.NewUnauthorizedError(msgs.InvalidAccountCredentials, err)
-	}
-	isValid := crypto.ComparePassword(account.Password(), destination.Hash, destination.Password)
-	if !isValid {
-		return "", repositoryerrors.NewUnauthorizedError(msgs.InvalidAccountCredentials, err)
-	}
-	token, err := destination.ConvertToDomain().GenerateToken()
-	if err != nil {
-		log.Error(err)
-		return "", repositoryerrors.NewUnknownError(err)
-	}
-	stmt, err := conn.Prepare(query.Auth().UpdateToken())
-	if err != nil {
-		log.Error(err)
-		return "", repositoryerrors.NewUnknownError(err)
+		return nil, repositoryerrors.NewUnauthorizedError(msgs.InvalidAccountCredentials, err)
 	}
 
-	_, err = stmt.Exec(dto.Account().UpdateToken(destination.Id, token)...)
+	hashedPassword, err := hex.DecodeString(accountDto.Password)
 	if err != nil {
 		log.Error(err)
-		return "", repositoryerrors.NewUnknownError(err)
+		return nil, repositoryerrors.NewUnknownError(err)
 	}
 
-	return token, nil
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(account.Password()))
+	if err != nil {
+		log.Error(msgs.InvalidAccountCredentials)
+		return nil, repositoryerrors.NewUnauthorizedError(msgs.InvalidAccountCredentials, err)
+	}
+
+	account = *domain.NewAccount(
+		accountDto.Id,
+		accountDto.Name,
+		accountDto.Email,
+		"",
+		"",
+	)
+
+	return &account, nil
 }
 
 func (r Auth) handlePostgresError(err error) error {

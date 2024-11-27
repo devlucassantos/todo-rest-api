@@ -25,7 +25,7 @@ func NewTaskHandler() *Task {
 }
 
 // Create
-// @ID 			Create
+// @ID 			CreateTask
 // @Summary		Create a task
 // @Tags 		Task
 // @Description Route that allows registering a task in the system. To register a task it is necessary to inform the following data in the body of the request:
@@ -37,11 +37,12 @@ func NewTaskHandler() *Task {
 // @Accept 		json
 // @Produce 	json
 // @Security	bearerAuth
-// @Param 	    userId       path       int                          true          "User ID"    default(1)
-// @Param 		authJson 	 body 		request.Task                 true          "JSON responsible for sending all task registration data to the database"
+// @Param 	    userId       path       int                              true      "User ID"    default(1)
+// @Param 		authJson 	 body 		request.SwaggerTaskRequest       true      "JSON responsible for sending all task registration data to the database"
 // @Success 	201 		 {object} 	response.SwaggerIdResponse                 "Task successfully registered"
 // @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403          {object}   response.SwaggerForbiddenResponse 	       "The user does not have access to this information"
 // @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/task  [post]
@@ -79,7 +80,7 @@ func (h Task) Create(ctx echo.Context) error {
 }
 
 // Update
-// @ID 			Update
+// @ID 			UpdateTask
 // @Summary		Update a task
 // @Tags 		Task
 // @Description Route that allows editing a task in the system. To edit a task it is necessary to inform the following data:
@@ -91,12 +92,13 @@ func (h Task) Create(ctx echo.Context) error {
 // @Accept 		json
 // @Produce 	json
 // @Security	bearerAuth
-// @Param 	    userId      path        int                          true          "User ID"          default(1)
-// @Param 	    taskId      path        int                          true          "Task ID"    default(1)
-// @Param 		authJson    body 	    request.Task                 true          "JSON responsible for sending the data needed to update the task in the database"
+// @Param 	    userId      path        int                             true       "User ID"    default(1)
+// @Param 	    taskId      path        int                             true       "Task ID"    default(1)
+// @Param 		authJson    body 	    request.SwaggerTaskRequest      true       "JSON responsible for sending the data needed to update the task in the database"
 // @Success 	204         {object}    nil 									   "Task successfully edited"
 // @Failure 	400         {object}    response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401         {object}    response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403         {object}    response.SwaggerForbiddenResponse 	       "The user does not have access to this information"
 // @Failure 	404         {object}    response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422         {object}    response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500         {object}    response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -141,7 +143,7 @@ func (h Task) Update(ctx echo.Context) error {
 }
 
 // Delete
-// @ID 			Delete
+// @ID 			DeleteTask
 // @Summary		Delete a task
 // @Tags 		Task
 // @Description Route that allows deleting a task registered in the system
@@ -151,6 +153,7 @@ func (h Task) Update(ctx echo.Context) error {
 // @Success 	204 		 {object} 	nil                                        "Task successfully deleted"
 // @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403          {object}   response.SwaggerForbiddenResponse 	       "The user does not have access to this information"
 // @Failure 	404 		 {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -181,7 +184,7 @@ func (h Task) Delete(ctx echo.Context) error {
 }
 
 // FindAll
-// @ID 			FindAll
+// @ID 			FindAllTasks
 // @Summary 	Lists all user tasks
 // @Tags 		Task
 // @Description Route that allows searching all user tasks in the system
@@ -190,7 +193,8 @@ func (h Task) Delete(ctx echo.Context) error {
 // @Param 		userId    path      int                 true                   "User ID"    default(1)
 // @Success 	200       {array} 	response.SwaggerTaskResponse               "Successful request"
 // @Failure 	400       {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
-// @Failure 	401       {object} 	response.SwaggerUnauthorizedResponse       "The user is not authorized to make this request"
+// @Failure 	401       {object}  response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403       {object} 	response.SwaggerForbiddenResponse 	       "The user does not have access to this information"
 // @Failure 	404       {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422       {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500       {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -218,7 +222,7 @@ func (h Task) FindAll(ctx echo.Context) error {
 }
 
 // FindById
-// @ID 			FindById
+// @ID 			FindByTaskId
 // @Summary 	Search a task's data by ID
 // @Tags 		Task
 // @Description Route that allows searching a task registered in the system by ID
@@ -229,6 +233,7 @@ func (h Task) FindAll(ctx echo.Context) error {
 // @Success 	200       {object}    response.SwaggerTaskResponse               "Successful request"
 // @Failure 	400       {object}    response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401       {object}    response.SwaggerUnauthorizedResponse 	     "The user is not authorized to make this request"
+// @Failure 	403       {object}    response.SwaggerForbiddenResponse   	     "The user does not have access to this information"
 // @Failure 	404       {object} 	  response.SwaggerNotFoundErrorResponse 	 "The user has requested a non-existent resource"
 // @Failure 	422       {object} 	  response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500       {object} 	  response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
@@ -255,12 +260,11 @@ func (h Task) FindById(ctx echo.Context) error {
 		return handleServiceErrors(ctx, err)
 	}
 
-	taskResponse := response.NewTask(*task)
-	return writeAcceptResponse(ctx, taskResponse)
+	return writeAcceptResponse(ctx, response.NewTask(*task))
 }
 
 // FindByCollectionId
-// @ID 			FindByCollectionId
+// @ID 			FindTasksByCollectionId
 // @Summary 	Search all tasks by collection ID
 // @Tags 		Collection
 // @Description Route that allows searching all tasks registered in the system by collection ID
@@ -271,6 +275,7 @@ func (h Task) FindById(ctx echo.Context) error {
 // @Success 	200             {object}    response.SwaggerTaskResponse               "Successful request"
 // @Failure 	400             {object}    response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401             {object}    response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
+// @Failure 	403             {object}    response.SwaggerForbiddenResponse   	   "The user does not have access to this information"
 // @Failure 	404             {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422             {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500             {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"

@@ -1,14 +1,20 @@
-FROM golang:alpine
+FROM golang:1.23 AS builder
 
-WORKDIR /
+COPY src /app/src
+COPY .env /app/.env
+COPY docs /app/docs
+COPY go.mod /app
+COPY go.sum /app
+COPY main.go /app
 
-COPY go.mod /
-COPY go.sum /
-COPY main.go /
-COPY docs /docs
-COPY src /src
-COPY .env /.env
+WORKDIR /app
 
-RUN go build -o /build
+RUN go mod tidy && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o todo-rest-api
 
-CMD ["/build"]
+
+FROM gcr.io/distroless/static
+
+COPY --from=builder /app/.env /.env
+COPY --from=builder /app/todo-rest-api /todo-rest-api
+
+ENTRYPOINT ["/todo-rest-api"]

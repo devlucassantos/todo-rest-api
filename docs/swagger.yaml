@@ -1,6 +1,21 @@
 basePath: /api
 definitions:
-  request.Account:
+  request.SwaggerCollectionRequest:
+    properties:
+      name:
+        example: Collection example
+        type: string
+    type: object
+  request.SwaggerSignInRequest:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+      password:
+        example: ex@mplePassw0rd
+        type: string
+    type: object
+  request.SwaggerSignUpRequest:
     properties:
       email:
         example: example@example.com
@@ -12,13 +27,7 @@ definitions:
         example: ex@mplePassw0rd
         type: string
     type: object
-  request.Collection:
-    properties:
-      name:
-        example: Collection example
-        type: string
-    type: object
-  request.Task:
+  request.SwaggerTaskRequest:
     properties:
       collection_id:
         example: 1
@@ -29,6 +38,21 @@ definitions:
       finished:
         example: false
         type: boolean
+    type: object
+  response.SwaggerAuthResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...
+        type: string
+      email:
+        example: example@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Example Name
+        type: string
     type: object
   response.SwaggerCollectionResponse:
     properties:
@@ -52,6 +76,12 @@ definitions:
           and/or duplicate data.
         type: string
     type: object
+  response.SwaggerForbiddenResponse:
+    properties:
+      message:
+        example: Oops! You do not have access to this information.
+        type: string
+    type: object
   response.SwaggerGenericErrorResponse:
     properties:
       error_msg:
@@ -73,26 +103,11 @@ definitions:
         example: Field example
         type: string
     type: object
-  response.SwaggerLoginResponse:
-    properties:
-      access_token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...
-        type: string
-    type: object
   response.SwaggerNotFoundErrorResponse:
     properties:
       error_msg:
         example: Not Found
         type: string
-    type: object
-  response.SwaggerSignUpResponse:
-    properties:
-      access_token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...
-        type: string
-      id:
-        example: 1
-        type: integer
     type: object
   response.SwaggerTaskResponse:
     properties:
@@ -131,6 +146,8 @@ info:
     url: https://github.com/devlucassantos
   description: This repository is an example of an API made in Go with the To Do List
     theme.
+  license:
+    name: MIT
   title: To Do List API
   version: 1.0.0
 paths:
@@ -150,18 +167,22 @@ paths:
         name: authJson
         required: true
         schema:
-          $ref: '#/definitions/request.Account'
+          $ref: '#/definitions/request.SwaggerSignInRequest'
       produces:
       - application/json
       responses:
-        "201":
+        "200":
           description: User successfully signed in
           schema:
-            $ref: '#/definitions/response.SwaggerLoginResponse'
+            $ref: '#/definitions/response.SwaggerAuthResponse'
         "400":
           description: The user has made a bad request
           schema:
             $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+        "401":
+          description: The user is not authorized to access this account
+          schema:
+            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
         "422":
           description: Some entered data could not be processed because it is not
             valid
@@ -192,14 +213,14 @@ paths:
         name: authJson
         required: true
         schema:
-          $ref: '#/definitions/request.Account'
+          $ref: '#/definitions/request.SwaggerSignUpRequest'
       produces:
       - application/json
       responses:
         "201":
           description: User successfully registered
           schema:
-            $ref: '#/definitions/response.SwaggerSignUpResponse'
+            $ref: '#/definitions/response.SwaggerAuthResponse'
         "400":
           description: The user has made a bad request
           schema:
@@ -223,7 +244,7 @@ paths:
   /user/{userId}/collection:
     get:
       description: Route that allows searching all user collections in the system
-      operationId: FindAll
+      operationId: FindAllCollections
       parameters:
       - default: 1
         description: User ID
@@ -248,6 +269,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -274,7 +299,7 @@ paths:
         |   Name   |  Type  |   Required  | Description      |
         |----------|--------|-------------|------------------|
         |   name   | string |      x      | Collection name |
-      operationId: Create
+      operationId: CreateCollection
       parameters:
       - default: 1
         description: User ID
@@ -288,7 +313,7 @@ paths:
         name: authJson
         required: true
         schema:
-          $ref: '#/definitions/request.Collection'
+          $ref: '#/definitions/request.SwaggerCollectionRequest'
       produces:
       - application/json
       responses:
@@ -304,6 +329,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "422":
           description: Some entered data could not be processed because it is not
             valid
@@ -321,7 +350,7 @@ paths:
   /user/{userId}/collection/{collectionId}:
     delete:
       description: Route that allows deleting a collection registered in the system
-      operationId: Delete
+      operationId: DeleteCollection
       parameters:
       - default: 1
         description: User ID
@@ -346,6 +375,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -367,7 +400,7 @@ paths:
     get:
       description: Route that allows searching a collection registered in the system
         by ID
-      operationId: FindById
+      operationId: FindByCollectionId
       parameters:
       - default: 1
         description: User ID
@@ -396,6 +429,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -421,7 +458,7 @@ paths:
         a collection it is necessary to inform the following data:\n|   Name   |  Type
         \ |   Required  | Description\t     |\n|----------|--------|-------------|------------------|\n|
         \  name   | string |      x      | Collection name  |"
-      operationId: Update
+      operationId: UpdateCollection
       parameters:
       - default: 1
         description: User ID
@@ -441,7 +478,7 @@ paths:
         name: authJson
         required: true
         schema:
-          $ref: '#/definitions/request.Collection'
+          $ref: '#/definitions/request.SwaggerCollectionRequest'
       produces:
       - application/json
       responses:
@@ -455,6 +492,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -477,7 +518,7 @@ paths:
     get:
       description: Route that allows searching all tasks registered in the system
         by collection ID
-      operationId: FindByCollectionId
+      operationId: FindTasksByCollectionId
       parameters:
       - default: 1
         description: User ID
@@ -506,6 +547,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -527,7 +572,7 @@ paths:
   /user/{userId}/task:
     get:
       description: Route that allows searching all user tasks in the system
-      operationId: FindAll
+      operationId: FindAllTasks
       parameters:
       - default: 1
         description: User ID
@@ -552,6 +597,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -580,7 +629,7 @@ paths:
         | description   | string |             | Task description                                  |
         | finished      |  bool  |             | If the task has been completed                    |
         | collection_id |  int   |             | ID of the collection to which the task is related |
-      operationId: Create
+      operationId: CreateTask
       parameters:
       - default: 1
         description: User ID
@@ -594,7 +643,7 @@ paths:
         name: authJson
         required: true
         schema:
-          $ref: '#/definitions/request.Task'
+          $ref: '#/definitions/request.SwaggerTaskRequest'
       produces:
       - application/json
       responses:
@@ -610,6 +659,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "422":
           description: Some entered data could not be processed because it is not
             valid
@@ -627,7 +680,7 @@ paths:
   /user/{userId}/task/{taskId}:
     delete:
       description: Route that allows deleting a task registered in the system
-      operationId: Delete
+      operationId: DeleteTask
       parameters:
       - default: 1
         description: User ID
@@ -652,6 +705,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -673,7 +730,7 @@ paths:
     get:
       description: Route that allows searching a task registered in the system by
         ID
-      operationId: FindById
+      operationId: FindByTaskId
       parameters:
       - default: 1
         description: User ID
@@ -702,6 +759,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:
@@ -730,7 +791,7 @@ paths:
         | description   | string |             | Task description                                  |
         | finished      |  bool  |             | If the task has been completed                    |
         | collection_id |  int   |             | ID of the collection to which the task is related |
-      operationId: Update
+      operationId: UpdateTask
       parameters:
       - default: 1
         description: User ID
@@ -750,7 +811,7 @@ paths:
         name: authJson
         required: true
         schema:
-          $ref: '#/definitions/request.Task'
+          $ref: '#/definitions/request.SwaggerTaskRequest'
       produces:
       - application/json
       responses:
@@ -764,6 +825,10 @@ paths:
           description: The user is not authorized to make this request
           schema:
             $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
+        "403":
+          description: The user does not have access to this information
+          schema:
+            $ref: '#/definitions/response.SwaggerForbiddenResponse'
         "404":
           description: The user has requested a non-existent resource
           schema:

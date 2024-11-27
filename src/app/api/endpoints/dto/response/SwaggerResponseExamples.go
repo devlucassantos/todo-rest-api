@@ -1,11 +1,9 @@
 package response
 
-type SwaggerSignUpResponse struct {
-	Id          int    `json:"id" example:"1"`
-	AccessToken string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..."`
-}
-
-type SwaggerLoginResponse struct {
+type SwaggerAuthResponse struct {
+	Id          int    `json:"id"           example:"1"`
+	Name        string `json:"name"         example:"Example Name"`
+	Email       string `json:"email"        example:"example@example.com"`
 	AccessToken string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..."`
 }
 
@@ -35,6 +33,10 @@ type SwaggerNotFoundErrorResponse struct {
 
 type SwaggerUnauthorizedResponse struct {
 	Message string `json:"message" example:"Oops! You are not authorized."`
+}
+
+type SwaggerForbiddenResponse struct {
+	Message string `json:"message" example:"Oops! You do not have access to this information."`
 }
 
 type SwaggerValidationErrorResponse struct {

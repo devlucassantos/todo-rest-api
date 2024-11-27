@@ -7,6 +7,9 @@
             "name": "Lucas Santos",
             "url": "https://github.com/devlucassantos"
         },
+        "license": {
+            "name": "MIT"
+        },
         "version": "1.0.0"
     },
     "host": "localhost:8000",
@@ -33,21 +36,27 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Account"
+                            "$ref": "#/definitions/request.SwaggerSignInRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "User successfully signed in",
                         "schema": {
-                            "$ref": "#/definitions/response.SwaggerLoginResponse"
+                            "$ref": "#/definitions/response.SwaggerAuthResponse"
                         }
                     },
                     "400": {
                         "description": "The user has made a bad request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "The user is not authorized to access this account",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
                         }
                     },
                     "422": {
@@ -86,7 +95,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Account"
+                            "$ref": "#/definitions/request.SwaggerSignUpRequest"
                         }
                     }
                 ],
@@ -94,7 +103,7 @@
                     "201": {
                         "description": "User successfully registered",
                         "schema": {
-                            "$ref": "#/definitions/response.SwaggerSignUpResponse"
+                            "$ref": "#/definitions/response.SwaggerAuthResponse"
                         }
                     },
                     "400": {
@@ -139,7 +148,7 @@
                     "Collection"
                 ],
                 "summary": "Lists all user collections",
-                "operationId": "FindAll",
+                "operationId": "FindAllCollections",
                 "parameters": [
                     {
                         "type": "integer",
@@ -170,6 +179,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -209,7 +224,7 @@
                     "Collection"
                 ],
                 "summary": "Create a collection",
-                "operationId": "Create",
+                "operationId": "CreateCollection",
                 "parameters": [
                     {
                         "type": "integer",
@@ -225,7 +240,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Collection"
+                            "$ref": "#/definitions/request.SwaggerCollectionRequest"
                         }
                     }
                 ],
@@ -246,6 +261,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "422": {
@@ -278,7 +299,7 @@
                     "Collection"
                 ],
                 "summary": "Search a collection's data by ID",
-                "operationId": "FindById",
+                "operationId": "FindByCollectionId",
                 "parameters": [
                     {
                         "type": "integer",
@@ -314,6 +335,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -353,7 +380,7 @@
                     "Collection"
                 ],
                 "summary": "Update a collection",
-                "operationId": "Update",
+                "operationId": "UpdateCollection",
                 "parameters": [
                     {
                         "type": "integer",
@@ -377,7 +404,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Collection"
+                            "$ref": "#/definitions/request.SwaggerCollectionRequest"
                         }
                     }
                 ],
@@ -395,6 +422,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -428,7 +461,7 @@
                     "Collection"
                 ],
                 "summary": "Delete a collection",
-                "operationId": "Delete",
+                "operationId": "DeleteCollection",
                 "parameters": [
                     {
                         "type": "integer",
@@ -461,6 +494,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -499,7 +538,7 @@
                     "Collection"
                 ],
                 "summary": "Search all tasks by collection ID",
-                "operationId": "FindByCollectionId",
+                "operationId": "FindTasksByCollectionId",
                 "parameters": [
                     {
                         "type": "integer",
@@ -535,6 +574,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -573,7 +618,7 @@
                     "Task"
                 ],
                 "summary": "Lists all user tasks",
-                "operationId": "FindAll",
+                "operationId": "FindAllTasks",
                 "parameters": [
                     {
                         "type": "integer",
@@ -604,6 +649,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -643,7 +694,7 @@
                     "Task"
                 ],
                 "summary": "Create a task",
-                "operationId": "Create",
+                "operationId": "CreateTask",
                 "parameters": [
                     {
                         "type": "integer",
@@ -659,7 +710,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Task"
+                            "$ref": "#/definitions/request.SwaggerTaskRequest"
                         }
                     }
                 ],
@@ -680,6 +731,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "422": {
@@ -712,7 +769,7 @@
                     "Task"
                 ],
                 "summary": "Search a task's data by ID",
-                "operationId": "FindById",
+                "operationId": "FindByTaskId",
                 "parameters": [
                     {
                         "type": "integer",
@@ -748,6 +805,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -787,7 +850,7 @@
                     "Task"
                 ],
                 "summary": "Update a task",
-                "operationId": "Update",
+                "operationId": "UpdateTask",
                 "parameters": [
                     {
                         "type": "integer",
@@ -811,7 +874,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Task"
+                            "$ref": "#/definitions/request.SwaggerTaskRequest"
                         }
                     }
                 ],
@@ -829,6 +892,12 @@
                         "description": "The user is not authorized to make this request",
                         "schema": {
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
                         }
                     },
                     "404": {
@@ -862,7 +931,7 @@
                     "Task"
                 ],
                 "summary": "Delete a task",
-                "operationId": "Delete",
+                "operationId": "DeleteTask",
                 "parameters": [
                     {
                         "type": "integer",
@@ -897,6 +966,12 @@
                             "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
                         }
                     },
+                    "403": {
+                        "description": "The user does not have access to this information",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
+                        }
+                    },
                     "404": {
                         "description": "The user has requested a non-existent resource",
                         "schema": {
@@ -920,7 +995,29 @@
         }
     },
     "definitions": {
-        "request.Account": {
+        "request.SwaggerCollectionRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Collection example"
+                }
+            }
+        },
+        "request.SwaggerSignInRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "example@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "ex@mplePassw0rd"
+                }
+            }
+        },
+        "request.SwaggerSignUpRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -937,16 +1034,7 @@
                 }
             }
         },
-        "request.Collection": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "example": "Collection example"
-                }
-            }
-        },
-        "request.Task": {
+        "request.SwaggerTaskRequest": {
             "type": "object",
             "properties": {
                 "collection_id": {
@@ -960,6 +1048,27 @@
                 "finished": {
                     "type": "boolean",
                     "example": false
+                }
+            }
+        },
+        "response.SwaggerAuthResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..."
+                },
+                "email": {
+                    "type": "string",
+                    "example": "example@example.com"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Example Name"
                 }
             }
         },
@@ -994,6 +1103,15 @@
                 }
             }
         },
+        "response.SwaggerForbiddenResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Oops! You do not have access to this information."
+                }
+            }
+        },
         "response.SwaggerGenericErrorResponse": {
             "type": "object",
             "properties": {
@@ -1025,34 +1143,12 @@
                 }
             }
         },
-        "response.SwaggerLoginResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..."
-                }
-            }
-        },
         "response.SwaggerNotFoundErrorResponse": {
             "type": "object",
             "properties": {
                 "error_msg": {
                     "type": "string",
                     "example": "Not Found"
-                }
-            }
-        },
-        "response.SwaggerSignUpResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..."
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 1
                 }
             }
         },

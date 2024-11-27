@@ -1,19 +1,22 @@
-version: '3'
-
 services:
-  db:
-    container_name: todo-database-dev
-    build:
-      dockerfile: ./docker/Dockerfile
-      context: "../"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=12345678
-    ports:
-      - "5432:5432"
-    networks:
-      - todo
+    todo_postgresql_dev:
+        container_name: todo_postgresql_dev
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+            args:
+                POSTGRES_DB: todo_db
+                POSTGRES_SERVICE_USER: todo_service
+                POSTGRES_SERVICE_USER_PASSWORD: todo_service_password
+#        volumes: # Uncomment these lines if you want to persist the data even after deleting the container
+#            - todo_data:/var/lib/postgresql/data # Uncomment these lines if you want to persist the data even after deleting the container
+        restart: always
+        environment:
+            POSTGRES_DB: todo_db
+            POSTGRES_USER: todo_user
+            POSTGRES_PASSWORD: todo_password
+        ports:
+            - "5434:5432"
 
-networks:
-  todo:
-    driver: bridge
+#volumes: # Uncomment these lines if you want to persist the data even after deleting the container
+#    todo_data: # Uncomment these lines if you want to persist the data even after deleting the container

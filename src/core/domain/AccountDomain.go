@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/gommon/log"
 	"os"
@@ -17,37 +16,41 @@ type Account struct {
 	name     string
 	email    string
 	password string
-	hash     string
 	token    string
 }
 
-func NewValidatedAccount(id int, name, email, password, hash, token string) (*Account, *todoerrors.Validation) {
+func NewValidatedAccount(id int, name, email, password, token string) (*Account, *todoerrors.Validation) {
 	formattedEmail := strings.ToLower(strings.TrimSpace(email))
-	matched, err := regexp.MatchString("^[a-zA-Z\\d.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z\\d](?:[a-zA-Z\\d-]{0,61}[a-zA-Z\\d])?(?:\\.[a-zA-Z\\d](?:[a-zA-Z\\d-]{0,61}[a-zA-Z\\d])?)*$", formattedEmail)
+	matched, err := regexp.MatchString("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", formattedEmail)
 	if !matched || err != nil {
-		log.Error(err)
+		log.Error(msgs.InvalidAccountEmail)
 		invalidFields := todoerrors.InvalidFields{}
 		invalidFields.AppendField(msgs.AccountEmail, msgs.InvalidAccountEmail)
+		return nil, todoerrors.NewValidationError(msgs.InvalidAccountDetails, invalidFields)
+	}
+
+	if len(password) < 8 || len(password) > 50 {
+		log.Error(msgs.InvalidAccountPassword)
+		invalidFields := todoerrors.InvalidFields{}
+		invalidFields.AppendField(msgs.AccountPassword, msgs.InvalidAccountPassword)
 		return nil, todoerrors.NewValidationError(msgs.InvalidAccountDetails, invalidFields)
 	}
 
 	return &Account{
 		id:       id,
 		name:     strings.TrimSpace(name),
-		email:    formattedEmail,
+		email:    email,
 		password: password,
-		hash:     hash,
 		token:    token,
 	}, nil
 }
 
-func NewAccount(id int, name, email, password, hash, token string) *Account {
+func NewAccount(id int, name, email, password, token string) *Account {
 	return &Account{
 		id:       id,
 		name:     strings.TrimSpace(name),
 		email:    strings.ToLower(strings.TrimSpace(email)),
 		password: password,
-		hash:     hash,
 		token:    token,
 	}
 }
@@ -70,14 +73,6 @@ func (d Account) Password() string {
 
 func (d *Account) SetPassword(password string) {
 	d.password = password
-}
-
-func (d Account) Hash() string {
-	return d.hash
-}
-
-func (d *Account) SetHash(hash string) {
-	d.hash = hash
 }
 
 func (d Account) Token() string {
@@ -107,8 +102,7 @@ func (d Account) buildClaims() *jwt.MapClaims {
 	return &jwt.MapClaims{
 		"exp":   exp,
 		"iat":   now,
-		"typ":   "Bearer",
-		"iss":   fmt.Sprintf("https://%s:%s", os.Getenv("SERVER_ADDRESS"), os.Getenv("SERVER_PORT")),
+		"iss":   "To Do List - REST API",
 		"id":    d.id,
 		"email": d.email,
 	}

@@ -9,7 +9,6 @@ type accountDto struct {
 	Name     string `db:"account_name"`
 	Email    string `db:"account_email"`
 	Password string `db:"account_password"`
-	Hash     string `db:"account_hash"`
 	Token    string `db:"account_token"`
 }
 
@@ -19,7 +18,6 @@ func (d accountDto) ConvertToDomain() *domain.Account {
 		d.Name,
 		d.Email,
 		d.Password,
-		d.Hash,
 		d.Token,
 	)
 }
@@ -35,8 +33,6 @@ func (accountDtoManager) Insert(account domain.Account) []interface{} {
 		account.Name(),
 		account.Email(),
 		account.Password(),
-		account.Hash(),
-		account.Token(),
 	}
 }
 

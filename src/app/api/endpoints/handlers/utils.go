@@ -40,6 +40,10 @@ func WriteUnauthorizedError(ctx echo.Context, message string) error {
 	return ctx.JSON(http.StatusUnauthorized, response.GenericErrorResponse{Message: message})
 }
 
+func WriteForbiddenError(ctx echo.Context, message string) error {
+	return ctx.JSON(http.StatusForbidden, response.GenericErrorResponse{Message: message})
+}
+
 func writeMissingInfoError(ctx echo.Context, err todoerrors.MissingInfo) error {
 	missingInfoErr := &response.GenericErrorResponse{Message: err.Error()}
 	return ctx.JSON(http.StatusBadRequest, *missingInfoErr)

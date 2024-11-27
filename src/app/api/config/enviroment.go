@@ -11,6 +11,6 @@ func NewServer() {
 
 	app := routes.LoadRoutes()
 
-	address := fmt.Sprintf("%s:%s", os.Getenv("SERVER_ADDRESS"), os.Getenv("SERVER_PORT"))
+	address := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
 	app.Logger.Fatal(app.Start(address))
 }

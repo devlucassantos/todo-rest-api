@@ -36,8 +36,8 @@ func NewAuthHandler() *Auth {
 // @Description | password | string |      x      | User password   |
 // @Accept 		json
 // @Produce 	json
-// @Param 		authJson 		body 		request.Account            true            "JSON responsible for sending all user registration data to the server"
-// @Success 	201 			{object} 	response.SwaggerSignUpResponse 			   "User successfully registered"
+// @Param 		authJson 		body 		request.SwaggerSignUpRequest     true      "JSON responsible for sending all user registration data to the server"
+// @Success 	201 			{object} 	response.SwaggerAuthResponse 			   "User successfully registered"
 // @Failure 	400 			{object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	409 			{object} 	response.SwaggerConflictErrorResponse 	   "The user tried to register with the email of an existing user"
 // @Failure 	422 			{object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
@@ -57,23 +57,18 @@ func (h Auth) SignUp(ctx echo.Context) error {
 		requestData.Email,
 		requestData.Password,
 		"",
-		"",
 	)
 	if validationError != nil {
 		return writeValidationError(ctx, *validationError)
 	}
 
-	id, token, err := h.service.SignUp(*account)
+	account, err := h.service.SignUp(*account)
 	if err != nil {
 		log.Error(err)
 		return handleServiceErrors(ctx, err)
 	}
 
-	authResponse := response.Auth{
-		Id:          *id,
-		AccessToken: *token,
-	}
-	return writeCreatedResponse(ctx, authResponse)
+	return writeCreatedResponse(ctx, response.NewAuth(*account))
 }
 
 // SignIn
@@ -87,9 +82,10 @@ func (h Auth) SignUp(ctx echo.Context) error {
 // @Description | password | string |      x      | User password   |
 // @Accept 		json
 // @Produce 	json
-// @Param 		authJson 	 body 		request.Account            true            "JSON responsible for sending all user sign in data to the server"
-// @Success 	201 		 {object} 	response.SwaggerLoginResponse 			   "User successfully signed in"
+// @Param 		authJson 	 body 		request.SwaggerSignInRequest     true      "JSON responsible for sending all user sign in data to the server"
+// @Success 	200 		 {object} 	response.SwaggerAuthResponse 			   "User successfully signed in"
 // @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
+// @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to access this account"
 // @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/auth/signin [post]
@@ -107,17 +103,13 @@ func (h Auth) SignIn(ctx echo.Context) error {
 		requestData.Email,
 		requestData.Password,
 		"",
-		"",
 	)
 
-	token, err := h.service.SignIn(*account)
+	account, err := h.service.SignIn(*account)
 	if err != nil {
 		log.Error(err)
 		return handleServiceErrors(ctx, err)
 	}
 
-	authResponse := response.Auth{
-		AccessToken: *token,
-	}
-	return writeCreatedResponse(ctx, authResponse)
+	return writeAcceptResponse(ctx, response.NewAuth(*account))
 }

@@ -1,7 +1,7 @@
 package request
 
 type Account struct {
-	Name     string `json:"name"     example:"Example Name"`
-	Email    string `json:"email"    example:"example@example.com"`
-	Password string `json:"password" example:"ex@mplePassw0rd"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
