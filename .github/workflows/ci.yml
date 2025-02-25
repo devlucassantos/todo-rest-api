@@ -107,4 +107,4 @@ jobs:
                       if [ -n "$CONTAINERS" ]; then
                         docker rm $CONTAINERS
                       fi
-                      docker-compose up -d --build
+                      docker compose up -d --build
