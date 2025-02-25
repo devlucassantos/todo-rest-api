@@ -114,4 +114,4 @@ jobs:
                       if [ -n "$CONTAINERS" ]; then
                         docker rm $CONTAINERS
                       fi
-                      docker compose up -d --build
+                      export $(grep -v '^#' .env | xargs) && sed "s|\${DATA_SOURCE_NAME}|$DATA_SOURCE_NAME|g" docker-compose.yml | docker compose up -d --build
