@@ -52,7 +52,7 @@ jobs:
               run: docker push lucassantos06/todo-rest-api:${{ steps.generate_tag.outputs.sha }}
 
             - name: Build Database Docker Image
-              run: docker build --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} --build-arg POSTGRES_SERVICE_USER=${{ secrets.POSTGRES_SERVICE_USER }} --build-arg POSTGRES_SERVICE_USER_PASSWORD=${{ secrets.POSTGRES_SERVICE_USER_PASSWORD }} -t lucassantos06/todo-postgresql:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-postgres .
+              run: docker build --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} --build-arg POSTGRES_SERVICE_USER=${{ secrets.POSTGRES_SERVICE_USER }} --build-arg POSTGRES_SERVICE_USER_PASSWORD=${{ secrets.POSTGRES_SERVICE_USER_PASSWORD }} -t lucassantos06/todo-postgresql:${{ steps.generate_tag.outputs.sha }} -e -f Dockerfile-postgres .
 
             - name: Push Database Docker Image
               run: docker push lucassantos06/todo-postgresql:${{ steps.generate_tag.outputs.sha }}
@@ -68,6 +68,12 @@ jobs:
 
             - name: Push Grafana Docker Image
               run: docker push lucassantos06/todo-grafana:${{ steps.generate_tag.outputs.sha }}
+
+            - name: Set up environment variables for Docker Compose
+              run: |
+                echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> $POSTGRES_DB
+                echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> $POSTGRES_USER
+                echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> $POSTGRES_PASSWORD
 
     deploy:
         name: Deploy to Digital Ocean

@@ -15,6 +15,10 @@ services:
         volumes:
             - todo_data:/var/lib/postgresql/data
         restart: always
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         ports:
             - "5433:5432"
         networks:
