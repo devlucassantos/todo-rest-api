@@ -17,6 +17,10 @@ services:
             - todo_data:/var/lib/postgresql/data
         restart: always
         env_file: .env
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         ports:
             - "5433:5432"
         networks:
@@ -27,6 +31,8 @@ services:
         image: prometheuscommunity/postgres-exporter:latest
         platform: linux/arm64
         env_file: .env
+        environment:
+            DATA_SOURCE_NAME: ${DATA_SOURCE_NAME}
         ports:
             - "9187:9187"
         depends_on:
@@ -49,6 +55,8 @@ services:
         container_name: todo_grafana
         image: lucassantos06/todo-grafana:${DOCKER_IMAGE_TAG}
         env_file: .env
+        environment:
+            GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
         ports:
             - "3000:3000"
         depends_on:
