@@ -1,9 +1,7 @@
 services:
     todo_rest_api:
         container_name: todo_rest_api
-        build:
-            context: .
-            dockerfile: Dockerfile-go
+        image: devlucassantos/todo-rest-api:${DOCKER_IMAGE_TAG}
         ports:
             - "8000:8000"
         depends_on:
@@ -12,15 +10,14 @@ services:
             - todo_network
     todo_postgresql:
         container_name: todo_postgresql
+        image: devlucassantos/todo-postgresql:${DOCKER_IMAGE_TAG}
         build:
-            context: .
-            dockerfile: Dockerfile-postgres
             args:
                 POSTGRES_DB: todo_db
                 POSTGRES_SERVICE_USER: todo_service
                 POSTGRES_SERVICE_USER_PASSWORD: todo_service_password
-#        volumes: # Uncomment these lines if you want to persist the data even after deleting the containers
-#            - todo_data:/var/lib/postgresql/data # Uncomment these lines if you want to persist the data even after deleting the containers
+        volumes:
+            - todo_data:/var/lib/postgresql/data
         restart: always
         environment:
             POSTGRES_DB: todo_db
@@ -46,9 +43,7 @@ services:
 
     todo_prometheus:
         container_name: todo_prometheus
-        build:
-            context: .
-            dockerfile: Dockerfile-prometheus
+        image: devlucassantos/todo-prometheus:${DOCKER_IMAGE_TAG}
         ports:
             - "9090:9090"
         depends_on:
@@ -59,9 +54,7 @@ services:
 
     todo_grafana:
         container_name: todo_grafana
-        build:
-            context: .
-            dockerfile: Dockerfile-grafana
+        image: devlucassantos/todo-grafana:${DOCKER_IMAGE_TAG}
         ports:
             - "3000:3000"
         depends_on:
@@ -69,8 +62,8 @@ services:
         networks:
             - todo_network
 
-#volumes: # Uncomment these lines if you want to persist the data even after deleting the container
-#    todo_data: # Uncomment these lines if you want to persist the data even after deleting the container
+volumes:
+    todo_data:
 
 networks:
     todo_network:
