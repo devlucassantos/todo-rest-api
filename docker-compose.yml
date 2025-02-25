@@ -26,7 +26,8 @@ services:
         container_name: todo_postgresql_exporter
         image: prometheuscommunity/postgres-exporter:latest
         platform: linux/arm64
-        env_file: .env
+        environment:
+            DATA_SOURCE_NAME: ${DATA_SOURCE_NAME}
         ports:
             - "9187:9187"
         depends_on:
