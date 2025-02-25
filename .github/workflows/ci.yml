@@ -46,28 +46,28 @@ jobs:
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Build API Docker Image
-              run: docker build -t devlucassantos/todo-rest-api:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-go .
+              run: docker build -t lucassantos06/todo-rest-api:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-go .
 
             - name: Push API Docker Image
-              run: docker push devlucassantos/todo-rest-api:${{ steps.generate_tag.outputs.sha }}
+              run: docker push lucassantos06/todo-rest-api:${{ steps.generate_tag.outputs.sha }}
 
             - name: Build Database Docker Image
-              run: docker build -t devlucassantos/todo-prostgresql:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-postgres .
+              run: docker build -t lucassantos06/todo-prostgresql:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-postgres .
 
             - name: Push Database Docker Image
-              run: docker push devlucassantos/todo-prostgresql:${{ steps.generate_tag.outputs.sha }}
+              run: docker push lucassantos06/todo-prostgresql:${{ steps.generate_tag.outputs.sha }}
 
             - name: Build Prometheus Docker Image
-              run: docker build -t devlucassantos/todo-prometheus:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-prometheus .
+              run: docker build -t lucassantos06/todo-prometheus:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-prometheus .
 
             - name: Push Prometheus Docker Image
-              run: docker push devlucassantos/todo-prometheus:${{ steps.generate_tag.outputs.sha }}
+              run: docker push lucassantos06/todo-prometheus:${{ steps.generate_tag.outputs.sha }}
 
             - name: Build Grafana Docker Image
-              run: docker build -t devlucassantos/todo-grafana:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-grafana .
+              run: docker build -t lucassantos06/todo-grafana:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-grafana .
 
             - name: Push Grafana Docker Image
-              run: docker push devlucassantos/todo-grafana:${{ steps.generate_tag.outputs.sha }}
+              run: docker push lucassantos06/todo-grafana:${{ steps.generate_tag.outputs.sha }}
 
     deploy:
         name: Deploy to Digital Ocean
