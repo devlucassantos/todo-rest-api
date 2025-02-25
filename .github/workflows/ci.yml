@@ -10,7 +10,7 @@ on:
 
 jobs:
     build:
-        name: 'Build and Test Go App'
+        name: Build, Test and Push Docker Images
         runs-on: ubuntu-latest
         outputs:
             docker_tag: ${{ steps.generate_tag.outputs.sha }}
@@ -84,17 +84,17 @@ jobs:
                   host: ${{ secrets.HOST }}
                   username: ${{ secrets.USER }}
                   password: ${{ secrets.PASSWORD }}
-                  source: "./docker-compose.yml"
+                  source: "docker-compose.yml"
                   target: "~/"
 
             - name: Copy .env file via SSH
               uses: appleboy/scp-action@v0.1.7
               with:
-                host: ${{ secrets.HOST }}
-                username: ${{ secrets.USER }}
-                password: ${{ secrets.PASSWORD }}
-                source: "./.env"
-                target: "~/"
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USER }}
+                  password: ${{ secrets.PASSWORD }}
+                  source: ".env"
+                  target: "~/"
 
             - name: Deploy via SSH
               uses: appleboy/ssh-action@v0.1.3
