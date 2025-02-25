@@ -29,9 +29,3 @@ func (collectionSelectSqlManager) All() string {
 				   name AS collection_name
 			FROM collection WHERE user_id = $1;`
 }
-
-func (collectionSelectSqlManager) ById() string {
-	return `SELECT id   AS collection_id,
-				   name AS collection_name
-			FROM collection WHERE id = $1 AND user_id = $2;`
-}

@@ -55,16 +55,6 @@ func (s Task) FindAll(userId int) ([]domain.Task, error) {
 	return taskList, nil
 }
 
-func (s Task) FindById(taskId, userId int) (*domain.Task, error) {
-	task, err := s.repository.FindById(taskId, userId)
-	if err != nil {
-		log.Error(err)
-		return nil, todoerrors.ConvertRepositoryErrorToServiceError(err, s.repository.FindById)
-	}
-
-	return task, nil
-}
-
 func (s Task) FindByCollectionId(collectionId, userId int) ([]domain.Task, error) {
 	taskList, err := s.repository.FindByCollectionId(collectionId, userId)
 	if err != nil {

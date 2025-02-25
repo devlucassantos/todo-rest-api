@@ -44,6 +44,10 @@ func WriteForbiddenError(ctx echo.Context, message string) error {
 	return ctx.JSON(http.StatusForbidden, response.GenericErrorResponse{Message: message})
 }
 
+func writeBadRequestError(ctx echo.Context, message string) error {
+	return ctx.JSON(http.StatusBadRequest, response.GenericErrorResponse{Message: message})
+}
+
 func writeMissingInfoError(ctx echo.Context, err todoerrors.MissingInfo) error {
 	missingInfoErr := &response.GenericErrorResponse{Message: err.Error()}
 	return ctx.JSON(http.StatusBadRequest, *missingInfoErr)
@@ -71,7 +75,7 @@ func writeValidationError(ctx echo.Context, err todoerrors.Validation) error {
 		InvalidFields: invalidFieldsResponse,
 	}
 
-	return ctx.JSON(http.StatusBadRequest, validationErr)
+	return ctx.JSON(http.StatusUnprocessableEntity, validationErr)
 }
 
 func writeNotFoundError(ctx echo.Context, message string) error {
@@ -103,19 +107,21 @@ func writeNoContentResponse(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-func convertToInt(value string, paramName string) (int, error) {
+func convertToPositiveInteger(value string, paramName string) (int, error) {
 	invalidFields := todoerrors.InvalidFields{}
 	if value == "" {
-		errorMessage := fmt.Sprintf("Parameter not reported: %s", paramName)
+		errorMessage := fmt.Sprintf("Parameter not provided: %s", paramName)
 		invalidFields.AppendField(paramName, errorMessage)
 		return -1, todoerrors.NewValidationError(errorMessage, invalidFields)
 	}
 	intValue, err := strconv.Atoi(value)
-	if err != nil {
-		log.Error(err.Error())
+	if intValue <= 0 {
+		if err != nil {
+			log.Error(err.Error())
+		}
 		errorMessage := fmt.Sprintf("Invalid parameter: %s", paramName)
 		invalidFields.AppendField(paramName, errorMessage)
-		return -1, todoerrors.NewValidationError(paramName, invalidFields)
+		return -1, todoerrors.NewValidationError(errorMessage, invalidFields)
 	}
 
 	return intValue, nil

@@ -54,6 +54,12 @@ definitions:
         example: Example Name
         type: string
     type: object
+  response.SwaggerBadRequestResponse:
+    properties:
+      message:
+        example: The request format is invalid.
+        type: string
+    type: object
   response.SwaggerCollectionResponse:
     properties:
       id:
@@ -178,7 +184,7 @@ paths:
         "400":
           description: The user has made a bad request
           schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+            $ref: '#/definitions/response.SwaggerBadRequestResponse'
         "401":
           description: The user is not authorized to access this account
           schema:
@@ -224,7 +230,7 @@ paths:
         "400":
           description: The user has made a bad request
           schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+            $ref: '#/definitions/response.SwaggerBadRequestResponse'
         "409":
           description: The user tried to register with the email of an existing user
           schema:
@@ -261,10 +267,6 @@ paths:
             items:
               $ref: '#/definitions/response.SwaggerCollectionResponse'
             type: array
-        "400":
-          description: The user has made a bad request
-          schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
         "401":
           description: The user is not authorized to make this request
           schema:
@@ -324,7 +326,7 @@ paths:
         "400":
           description: The user has made a bad request
           schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+            $ref: '#/definitions/response.SwaggerBadRequestResponse'
         "401":
           description: The user is not authorized to make this request
           schema:
@@ -367,10 +369,6 @@ paths:
       responses:
         "204":
           description: Collection successfully deleted
-        "400":
-          description: The user has made a bad request
-          schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
         "401":
           description: The user is not authorized to make this request
           schema:
@@ -395,60 +393,6 @@ paths:
       security:
       - bearerAuth: []
       summary: Delete a collection
-      tags:
-      - Collection
-    get:
-      description: Route that allows searching a collection registered in the system
-        by ID
-      operationId: FindByCollectionId
-      parameters:
-      - default: 1
-        description: User ID
-        in: path
-        name: userId
-        required: true
-        type: integer
-      - default: 1
-        description: Collection ID
-        in: path
-        name: collectionId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful request
-          schema:
-            $ref: '#/definitions/response.SwaggerCollectionResponse'
-        "400":
-          description: The user has made a bad request
-          schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
-        "401":
-          description: The user is not authorized to make this request
-          schema:
-            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
-        "403":
-          description: The user does not have access to this information
-          schema:
-            $ref: '#/definitions/response.SwaggerForbiddenResponse'
-        "404":
-          description: The user has requested a non-existent resource
-          schema:
-            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
-        "422":
-          description: Some entered data could not be processed because it is not
-            valid
-          schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
-        "500":
-          description: An unexpected server error has occurred
-          schema:
-            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
-      security:
-      - bearerAuth: []
-      summary: Search a collection's data by ID
       tags:
       - Collection
     put:
@@ -487,7 +431,7 @@ paths:
         "400":
           description: The user has made a bad request
           schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
+            $ref: '#/definitions/response.SwaggerBadRequestResponse'
         "401":
           description: The user is not authorized to make this request
           schema:
@@ -514,7 +458,7 @@ paths:
       summary: Update a collection
       tags:
       - Collection
-  /user/{userId}/collection/{collectionId}/tasks:
+  /user/{userId}/collection/{collectionId}/task:
     get:
       description: Route that allows searching all tasks registered in the system
         by collection ID
@@ -725,60 +669,6 @@ paths:
       security:
       - bearerAuth: []
       summary: Delete a task
-      tags:
-      - Task
-    get:
-      description: Route that allows searching a task registered in the system by
-        ID
-      operationId: FindByTaskId
-      parameters:
-      - default: 1
-        description: User ID
-        in: path
-        name: userId
-        required: true
-        type: integer
-      - default: 1
-        description: Task ID
-        in: path
-        name: taskId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful request
-          schema:
-            $ref: '#/definitions/response.SwaggerTaskResponse'
-        "400":
-          description: The user has made a bad request
-          schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
-        "401":
-          description: The user is not authorized to make this request
-          schema:
-            $ref: '#/definitions/response.SwaggerUnauthorizedResponse'
-        "403":
-          description: The user does not have access to this information
-          schema:
-            $ref: '#/definitions/response.SwaggerForbiddenResponse'
-        "404":
-          description: The user has requested a non-existent resource
-          schema:
-            $ref: '#/definitions/response.SwaggerNotFoundErrorResponse'
-        "422":
-          description: Some entered data could not be processed because it is not
-            valid
-          schema:
-            $ref: '#/definitions/response.SwaggerValidationErrorResponse'
-        "500":
-          description: An unexpected server error has occurred
-          schema:
-            $ref: '#/definitions/response.SwaggerGenericErrorResponse'
-      security:
-      - bearerAuth: []
-      summary: Search a task's data by ID
       tags:
       - Task
     put:

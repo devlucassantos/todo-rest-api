@@ -54,13 +54,3 @@ func (s Collection) FindAll(userId int) ([]domain.Collection, error) {
 
 	return collectionList, nil
 }
-
-func (s Collection) FindById(collectionId, userId int) (*domain.Collection, error) {
-	collection, err := s.repository.FindById(collectionId, userId)
-	if err != nil {
-		log.Error(err)
-		return nil, todoerrors.ConvertRepositoryErrorToServiceError(err, s.repository.FindById)
-	}
-
-	return collection, nil
-}

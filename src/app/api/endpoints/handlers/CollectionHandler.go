@@ -37,15 +37,16 @@ func NewCollectionHandler() *Collection {
 // @Security	bearerAuth
 // @Param 	    userId       path       int                                true    "User ID"    default(1)
 // @Param 		authJson 	 body 		request.SwaggerCollectionRequest   true    "JSON responsible for sending all collection registration data to the database"
-// @Success 	201 		 {object} 	response.SwaggerIdResponse                 "Collection successfully registered"
-// @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
+// @Success 	201          {object} 	response.SwaggerIdResponse                 "Collection successfully registered"
+// @Failure 	400          {object} 	response.SwaggerBadRequestResponse         "The user has made a bad request"
+// @Failure 	422          {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
 // @Failure 	403          {object}   response.SwaggerForbiddenResponse   	   "The user does not have access to this information"
 // @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/collection  [post]
 func (h Collection) Create(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -55,9 +56,7 @@ func (h Collection) Create(ctx echo.Context) error {
 	var requestData request.Collection
 	if err = ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
+		return writeBadRequestError(ctx, msgs.RequestFormatError)
 	}
 	collection, collectionErr := domain.NewValidatedCollection(
 		-1,
@@ -65,7 +64,8 @@ func (h Collection) Create(ctx echo.Context) error {
 	)
 	if collectionErr != nil {
 		log.Error(collectionErr)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(collectionErr.Error(), *collectionErr.InvalidFields()))
+		return writeValidationError(ctx, *todoerrors.NewValidationError(collectionErr.Error(),
+			*collectionErr.InvalidFields()))
 	}
 
 	userIdCreated, err := h.service.Create(*collection, userId)
@@ -93,7 +93,8 @@ func (h Collection) Create(ctx echo.Context) error {
 // @Param 	    collectionId    path        int                                 true   "Collection ID"    default(1)
 // @Param 		authJson 	    body 	    request.SwaggerCollectionRequest    true   "JSON responsible for sending the data needed to update the collection in the database"
 // @Success 	204             {object}    nil 									   "Collection successfully edited"
-// @Failure 	400             {object}    response.SwaggerValidationErrorResponse    "The user has made a bad request"
+// @Failure 	400             {object} 	response.SwaggerBadRequestResponse         "The user has made a bad request"
+// @Failure 	422             {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401             {object}    response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
 // @Failure 	403             {object}    response.SwaggerForbiddenResponse   	   "The user does not have access to this information"
 // @Failure 	404             {object}    response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
@@ -101,14 +102,14 @@ func (h Collection) Create(ctx echo.Context) error {
 // @Failure 	500             {object}    response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/collection/{collectionId}  [put]
 func (h Collection) Update(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
 		invalidFields.AppendField(msgs.UserId, msgs.ConversionError)
 		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
 	}
-	collectionId, err := convertToInt(ctx.Param("collectionId"), msgs.UserId)
+	collectionId, err := convertToPositiveInteger(ctx.Param("collectionId"), msgs.CollectionId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -118,9 +119,7 @@ func (h Collection) Update(ctx echo.Context) error {
 	var requestData request.Collection
 	if err = ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
+		return writeBadRequestError(ctx, msgs.RequestFormatError)
 	}
 	collection, collectionErr := domain.NewValidatedCollection(
 		collectionId,
@@ -128,7 +127,8 @@ func (h Collection) Update(ctx echo.Context) error {
 	)
 	if collectionErr != nil {
 		log.Error(collectionErr)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(collectionErr.Error(), *collectionErr.InvalidFields()))
+		return writeValidationError(ctx, *todoerrors.NewValidationError(collectionErr.Error(),
+			*collectionErr.InvalidFields()))
 	}
 
 	err = h.service.Update(*collection, userId)
@@ -149,7 +149,7 @@ func (h Collection) Update(ctx echo.Context) error {
 // @Param 	    userId          path    int                  true                  "User ID"          default(1)
 // @Param 	    collectionId    path    int                  true                  "Collection ID"    default(1)
 // @Success 	204 		 {object} 	nil                                        "Collection successfully deleted"
-// @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
+// @Failure 	422          {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
 // @Failure 	403          {object}   response.SwaggerForbiddenResponse   	   "The user does not have access to this information"
 // @Failure 	404 		 {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
@@ -157,14 +157,14 @@ func (h Collection) Update(ctx echo.Context) error {
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/collection/{collectionId}  [delete]
 func (h Collection) Delete(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
 		invalidFields.AppendField(msgs.UserId, msgs.ConversionError)
 		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
 	}
-	collectionId, err := convertToInt(ctx.Param("collectionId"), msgs.UserId)
+	collectionId, err := convertToPositiveInteger(ctx.Param("collectionId"), msgs.CollectionId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -190,7 +190,7 @@ func (h Collection) Delete(ctx echo.Context) error {
 // @Security	bearerAuth
 // @Param 		userId    path      int                 true                   "User ID"    default(1)
 // @Success 	200       {array} 	response.SwaggerCollectionResponse         "Successful request"
-// @Failure 	400       {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
+// @Failure 	422       {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
 // @Failure 	401       {object}  response.SwaggerUnauthorizedResponse 	   "The user is not authorized to make this request"
 // @Failure 	403       {object} 	response.SwaggerForbiddenResponse          "The user does not have access to this information"
 // @Failure 	404       {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
@@ -198,7 +198,7 @@ func (h Collection) Delete(ctx echo.Context) error {
 // @Failure 	500       {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/collection 	[get]
 func (h Collection) FindAll(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -217,46 +217,4 @@ func (h Collection) FindAll(ctx echo.Context) error {
 		collectionResponseList = append(collectionResponseList, *response.NewCollection(collection))
 	}
 	return writeAcceptResponse(ctx, collectionResponseList)
-}
-
-// FindById
-// @ID 			FindByCollectionId
-// @Summary 	Search a collection's data by ID
-// @Tags 		Collection
-// @Description Route that allows searching a collection registered in the system by ID
-// @Produce		json
-// @Security	bearerAuth
-// @Param 	    userId          path        int                true                 "User ID"          default(1)
-// @Param 	    collectionId    path        int                true                 "Collection ID"    default(1)
-// @Success 	200          {object}    response.SwaggerCollectionResponse         "Successful request"
-// @Failure 	400 		 {object} 	 response.SwaggerValidationErrorResponse    "The user has made a bad request"
-// @Failure 	401          {object}    response.SwaggerUnauthorizedResponse 	    "The user is not authorized to make this request"
-// @Failure 	403          {object}    response.SwaggerForbiddenResponse   	    "The user does not have access to this information"
-// @Failure 	404 		 {object} 	 response.SwaggerNotFoundErrorResponse 	    "The user has requested a non-existent resource"
-// @Failure 	422 		 {object} 	 response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
-// @Failure 	500 		 {object} 	 response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
-// @Router 		/user/{userId}/collection/{collectionId}    [get]
-func (h Collection) FindById(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
-	if err != nil {
-		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.UserId, msgs.ConversionError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
-	}
-	collectionId, err := convertToInt(ctx.Param("collectionId"), msgs.UserId)
-	if err != nil {
-		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.CollectionId, msgs.ConversionError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
-	}
-
-	collection, err := h.service.FindById(collectionId, userId)
-	if err != nil {
-		log.Error(err)
-		return handleServiceErrors(ctx, err)
-	}
-
-	return writeAcceptResponse(ctx, response.NewCollection(*collection))
 }

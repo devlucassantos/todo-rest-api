@@ -108,24 +108,6 @@ func (r Collection) FindAll(userId int) ([]domain.Collection, error) {
 	return collectionList, nil
 }
 
-func (r Collection) FindById(collectionId, userId int) (*domain.Collection, error) {
-	connection, err := r.getConnection()
-	if err != nil {
-		log.Error(err)
-		return nil, repositoryerrors.NewServiceUnavailableError(msgs.ConnectionError, err)
-	}
-	defer r.closeConnection(connection)
-
-	destination := dto.Collection().Select().ById()
-	err = connection.Get(&destination, query.Collection().Select().ById(), collectionId, userId)
-	if err != nil {
-		log.Error(err)
-		return nil, r.handlePostgresError(err)
-	}
-
-	return destination.ConvertToDomain(), nil
-}
-
 func (r Collection) handlePostgresError(err error) error {
 	errMessage := err.Error()
 

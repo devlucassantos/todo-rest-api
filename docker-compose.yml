@@ -31,6 +31,44 @@ services:
         networks:
             - todo_network
 
+    todo_postgresql_exporter:
+        container_name: todo_postgresql_exporter
+        image: prometheuscommunity/postgres-exporter:latest
+        platform: linux/arm64
+        environment:
+            DATA_SOURCE_NAME: "postgresql://todo_service:todo_service_password@todo_postgresql:5432/todo_db?sslmode=disable"
+        ports:
+            - "9187:9187"
+        depends_on:
+            - todo_postgresql
+        networks:
+            - todo_network
+
+    todo_prometheus:
+        container_name: todo_prometheus
+        build:
+            context: .
+            dockerfile: Dockerfile-prometheus
+        ports:
+            - "9090:9090"
+        depends_on:
+            - todo_rest_api
+            - todo_postgresql_exporter
+        networks:
+            - todo_network
+
+    todo_grafana:
+        container_name: todo_grafana
+        build:
+            context: .
+            dockerfile: Dockerfile-grafana
+        ports:
+            - "3000:3000"
+        depends_on:
+            - todo_prometheus
+        networks:
+            - todo_network
+
 #volumes: # Uncomment these lines if you want to persist the data even after deleting the container
 #    todo_data: # Uncomment these lines if you want to persist the data even after deleting the container
 

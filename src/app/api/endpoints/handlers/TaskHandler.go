@@ -47,7 +47,7 @@ func NewTaskHandler() *Task {
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/task  [post]
 func (h Task) Create(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -57,9 +57,7 @@ func (h Task) Create(ctx echo.Context) error {
 	var requestData request.Task
 	if err = ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
+		return writeBadRequestError(ctx, msgs.RequestFormatError)
 	}
 	collection := domain.NewCollection(requestData.CollectionId, "")
 	task := domain.NewTask(
@@ -104,14 +102,14 @@ func (h Task) Create(ctx echo.Context) error {
 // @Failure 	500         {object}    response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/task/{taskId}  [put]
 func (h Task) Update(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
 		invalidFields.AppendField(msgs.UserId, msgs.ConversionError)
 		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
 	}
-	taskId, err := convertToInt(ctx.Param("taskId"), msgs.UserId)
+	taskId, err := convertToPositiveInteger(ctx.Param("taskId"), msgs.TaskId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -121,9 +119,7 @@ func (h Task) Update(ctx echo.Context) error {
 	var requestData request.Task
 	if err = ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
+		return writeBadRequestError(ctx, msgs.RequestFormatError)
 	}
 	collection := domain.NewCollection(requestData.CollectionId, "")
 	task := domain.NewTask(
@@ -159,14 +155,14 @@ func (h Task) Update(ctx echo.Context) error {
 // @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/task/{taskId}  [delete]
 func (h Task) Delete(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
 		invalidFields.AppendField(msgs.UserId, msgs.ConversionError)
 		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
 	}
-	taskId, err := convertToInt(ctx.Param("taskId"), msgs.UserId)
+	taskId, err := convertToPositiveInteger(ctx.Param("taskId"), msgs.TaskId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -200,7 +196,7 @@ func (h Task) Delete(ctx echo.Context) error {
 // @Failure 	500       {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
 // @Router 		/user/{userId}/task 	[get]
 func (h Task) FindAll(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
@@ -221,48 +217,6 @@ func (h Task) FindAll(ctx echo.Context) error {
 	return writeAcceptResponse(ctx, taskResponseList)
 }
 
-// FindById
-// @ID 			FindByTaskId
-// @Summary 	Search a task's data by ID
-// @Tags 		Task
-// @Description Route that allows searching a task registered in the system by ID
-// @Produce		json
-// @Security	bearerAuth
-// @Param 	    userId    path        int                true                    "User ID"    default(1)
-// @Param 	    taskId    path        int                true                    "Task ID"    default(1)
-// @Success 	200       {object}    response.SwaggerTaskResponse               "Successful request"
-// @Failure 	400       {object}    response.SwaggerValidationErrorResponse    "The user has made a bad request"
-// @Failure 	401       {object}    response.SwaggerUnauthorizedResponse 	     "The user is not authorized to make this request"
-// @Failure 	403       {object}    response.SwaggerForbiddenResponse   	     "The user does not have access to this information"
-// @Failure 	404       {object} 	  response.SwaggerNotFoundErrorResponse 	 "The user has requested a non-existent resource"
-// @Failure 	422       {object} 	  response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
-// @Failure 	500       {object} 	  response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
-// @Router 		/user/{userId}/task/{taskId}    [get]
-func (h Task) FindById(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
-	if err != nil {
-		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.UserId, msgs.ConversionError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
-	}
-	taskId, err := convertToInt(ctx.Param("taskId"), msgs.UserId)
-	if err != nil {
-		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.TaskId, msgs.ConversionError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
-	}
-
-	task, err := h.service.FindById(taskId, userId)
-	if err != nil {
-		log.Error(err)
-		return handleServiceErrors(ctx, err)
-	}
-
-	return writeAcceptResponse(ctx, response.NewTask(*task))
-}
-
 // FindByCollectionId
 // @ID 			FindTasksByCollectionId
 // @Summary 	Search all tasks by collection ID
@@ -279,16 +233,16 @@ func (h Task) FindById(ctx echo.Context) error {
 // @Failure 	404             {object} 	response.SwaggerNotFoundErrorResponse 	   "The user has requested a non-existent resource"
 // @Failure 	422             {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
 // @Failure 	500             {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
-// @Router 		/user/{userId}/collection/{collectionId}/tasks    [get]
+// @Router 		/user/{userId}/collection/{collectionId}/task    [get]
 func (h Task) FindByCollectionId(ctx echo.Context) error {
-	userId, err := convertToInt(ctx.Param("userId"), msgs.UserId)
+	userId, err := convertToPositiveInteger(ctx.Param("userId"), msgs.UserId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}
 		invalidFields.AppendField(msgs.UserId, msgs.ConversionError)
 		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
 	}
-	collectionId, err := convertToInt(ctx.Param("collectionId"), msgs.UserId)
+	collectionId, err := convertToPositiveInteger(ctx.Param("collectionId"), msgs.CollectionId)
 	if err != nil {
 		log.Error(err)
 		invalidFields := todoerrors.InvalidFields{}

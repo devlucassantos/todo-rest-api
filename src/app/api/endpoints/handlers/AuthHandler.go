@@ -8,7 +8,6 @@ import (
 	"todo/src/app/api/endpoints/handlers/msgs"
 	"todo/src/core/domain"
 	interfaces "todo/src/core/interfaces/services"
-	"todo/src/core/projecterrors/todoerrors"
 	"todo/src/core/services"
 	"todo/src/infra/postgres"
 )
@@ -36,20 +35,19 @@ func NewAuthHandler() *Auth {
 // @Description | password | string |      x      | User password   |
 // @Accept 		json
 // @Produce 	json
-// @Param 		authJson 		body 		request.SwaggerSignUpRequest     true      "JSON responsible for sending all user registration data to the server"
-// @Success 	201 			{object} 	response.SwaggerAuthResponse 			   "User successfully registered"
-// @Failure 	400 			{object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
-// @Failure 	409 			{object} 	response.SwaggerConflictErrorResponse 	   "The user tried to register with the email of an existing user"
-// @Failure 	422 			{object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
-// @Failure 	500 			{object} 	response.SwaggerGenericErrorResponse 	   "An unexpected server error has occurred"
+// @Param 		authJson 		body 		request.SwaggerSignUpRequest     true   "JSON responsible for sending all user registration data to the server"
+// @Success 	201 			{object} 	response.SwaggerAuthResponse 			"User successfully registered"
+// @Failure 	400 			{object} 	response.SwaggerBadRequestResponse      "The user has made a bad request"
+// @Failure 	422 			{object} 	response.SwaggerValidationErrorResponse "The user has made a bad request"
+// @Failure 	409 			{object} 	response.SwaggerConflictErrorResponse 	"The user tried to register with the email of an existing user"
+// @Failure 	422 			{object} 	response.SwaggerValidationErrorResponse "Some entered data could not be processed because it is not valid"
+// @Failure 	500 			{object} 	response.SwaggerGenericErrorResponse 	"An unexpected server error has occurred"
 // @Router 		/auth/signup 	[post]
 func (h Auth) SignUp(ctx echo.Context) error {
 	var requestData request.Account
 	if err := ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
+		return writeBadRequestError(ctx, msgs.RequestFormatError)
 	}
 	account, validationError := domain.NewValidatedAccount(
 		-1,
@@ -59,6 +57,7 @@ func (h Auth) SignUp(ctx echo.Context) error {
 		"",
 	)
 	if validationError != nil {
+		log.Error(validationError)
 		return writeValidationError(ctx, *validationError)
 	}
 
@@ -82,28 +81,31 @@ func (h Auth) SignUp(ctx echo.Context) error {
 // @Description | password | string |      x      | User password   |
 // @Accept 		json
 // @Produce 	json
-// @Param 		authJson 	 body 		request.SwaggerSignInRequest     true      "JSON responsible for sending all user sign in data to the server"
-// @Success 	200 		 {object} 	response.SwaggerAuthResponse 			   "User successfully signed in"
-// @Failure 	400 		 {object} 	response.SwaggerValidationErrorResponse    "The user has made a bad request"
-// @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	   "The user is not authorized to access this account"
-// @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse    "Some entered data could not be processed because it is not valid"
-// @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse       "An unexpected server error has occurred"
+// @Param 		authJson 	 body 		request.SwaggerSignInRequest     true   "JSON responsible for sending all user sign in data to the server"
+// @Success 	200 		 {object} 	response.SwaggerAuthResponse 			"User successfully signed in"
+// @Failure 	400 		 {object} 	response.SwaggerBadRequestResponse      "The user has made a bad request"
+// @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse "The user has provided invalid data"
+// @Failure 	401          {object}   response.SwaggerUnauthorizedResponse 	"The user is not authorized to access this account"
+// @Failure 	422 		 {object} 	response.SwaggerValidationErrorResponse "Some entered data could not be processed because it is not valid"
+// @Failure 	500 		 {object} 	response.SwaggerGenericErrorResponse    "An unexpected server error has occurred"
 // @Router 		/auth/signin [post]
 func (h Auth) SignIn(ctx echo.Context) error {
 	var requestData request.Account
 	if err := ctx.Bind(&requestData); err != nil {
 		log.Error(err)
-		invalidFields := todoerrors.InvalidFields{}
-		invalidFields.AppendField(msgs.Request, msgs.RequestFormatError)
-		return writeValidationError(ctx, *todoerrors.NewValidationError(err.Error(), invalidFields))
+		return writeBadRequestError(ctx, msgs.RequestFormatError)
 	}
-	account := domain.NewAccount(
+	account, validationError := domain.NewValidatedAccount(
 		-1,
-		"",
+		requestData.Name,
 		requestData.Email,
 		requestData.Password,
 		"",
 	)
+	if validationError != nil {
+		log.Error(validationError)
+		return writeValidationError(ctx, *validationError)
+	}
 
 	account, err := h.service.SignIn(*account)
 	if err != nil {

@@ -7,6 +7,5 @@ type ITask interface {
 	Update(task domain.Task, userId int) error
 	Delete(taskId, userId int) error
 	FindAll(userId int) ([]domain.Task, error)
-	FindById(taskId, userId int) (*domain.Task, error)
 	FindByCollectionId(collectionId, userId int) ([]domain.Task, error)
 }

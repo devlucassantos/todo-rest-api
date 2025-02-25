@@ -1,0 +1,11 @@
+global:
+    scrape_interval: 15s
+
+scrape_configs:
+    - job_name: "todo_rest_api"
+      static_configs:
+          - targets: ["todo_rest_api:8000"]
+
+    - job_name: "todo_postgresql"
+      static_configs:
+          - targets: ["todo_postgresql_exporter:9187"]

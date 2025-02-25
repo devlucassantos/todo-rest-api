@@ -1,0 +1,92 @@
+name: todo-rest-api
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    build:
+        name: 'Build and Test Go App'
+        runs-on: ubuntu-latest
+        outputs:
+            docker_tag: ${{ steps.generate_tag.outputs.sha }}
+
+        steps:
+            - name: Checkout source code
+              uses: actions/checkout@v4
+
+            - name: Setup Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: '1.23'
+
+            - name: Install dependencies
+              run: go mod tidy
+
+            - name: Build application
+              run: go build -o app .
+
+            - name: Run Tests
+              run: go test ./...
+
+            - name: Generate Tag
+              id: generate_tag
+              run: |
+                  SHA=$(echo $GITHUB_SHA | head -c7)
+                  echo "sha=$SHA" >> $GITHUB_OUTPUT
+
+            - name: Login to DockerHub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Build Docker Image
+              run: docker build -t devlucassantos/todo-rest-api:${{ steps.generate_tag.outputs.sha }} .
+
+            - name: Push Docker Image
+              run: docker push devlucassantos/todo-rest-api:${{ steps.generate_tag.outputs.sha }}
+
+    deploy:
+        name: Deploy to Digital Ocean
+        runs-on: ubuntu-latest
+        needs: build
+
+        steps:
+            - name: Checkout source code
+              uses: actions/checkout@v4
+
+            - name: Copy docker-compose file via SSH
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USER }}
+                  password: ${{ secrets.PASSWORD }}
+                  source: "./docker-compose.yml"
+                  target: "~/"
+
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v0.1.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USER }}
+                  password: ${{ secrets.PASSWORD }}
+                  script: |
+                      TAG=${{ needs.build.outputs.docker_tag }}
+                      [ -e .env ] && rm .env
+                      touch .env
+                      echo "DOCKER_IMAGE_TAG=$TAG" > .env
+                      docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+                      CONTAINERS=$(docker ps -q)
+                      if [ -n "$CONTAINERS" ]; then
+                        docker stop $CONTAINERS
+                      fi
+                      CONTAINERS=$(docker ps -a -q)
+                      if [ -n "$CONTAINERS" ]; then
+                        docker rm $CONTAINERS
+                      fi
+                      docker-compose up -d --build

@@ -1,0 +1,32 @@
+{
+    "uid": "api-metrics",
+    "title": "API Metrics",
+    "tags": ["api", "golang", "metrics"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "panels": [
+        {
+            "type": "graph",
+            "title": "CPU Usage",
+            "targets": [
+                {
+                    "expr": "rate(process_cpu_seconds_total[5m])",
+                    "legendFormat": "CPU Usage"
+                }
+            ],
+            "gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 }
+        },
+        {
+            "type": "graph",
+            "title": "Memory Usage",
+            "targets": [
+                {
+                    "expr": "go_memstats_heap_alloc_bytes",
+                    "legendFormat": "Heap Memory"
+                }
+            ],
+            "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 }
+        }
+    ]
+}

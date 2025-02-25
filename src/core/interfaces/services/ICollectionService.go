@@ -7,5 +7,4 @@ type ICollection interface {
 	Update(collection domain.Collection, userId int) error
 	Delete(collectionId, userId int) error
 	FindAll(userId int) ([]domain.Collection, error)
-	FindById(collectionId, userId int) (*domain.Collection, error)
 }

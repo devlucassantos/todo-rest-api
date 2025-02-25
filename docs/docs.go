@@ -57,7 +57,7 @@ const docTemplate = `{
                     "400": {
                         "description": "The user has made a bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
+                            "$ref": "#/definitions/response.SwaggerBadRequestResponse"
                         }
                     },
                     "401": {
@@ -116,7 +116,7 @@ const docTemplate = `{
                     "400": {
                         "description": "The user has made a bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
+                            "$ref": "#/definitions/response.SwaggerBadRequestResponse"
                         }
                     },
                     "409": {
@@ -174,12 +174,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/response.SwaggerCollectionResponse"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "The user has made a bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
                         }
                     },
                     "401": {
@@ -261,7 +255,7 @@ const docTemplate = `{
                     "400": {
                         "description": "The user has made a bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
+                            "$ref": "#/definitions/response.SwaggerBadRequestResponse"
                         }
                     },
                     "401": {
@@ -292,84 +286,6 @@ const docTemplate = `{
             }
         },
         "/user/{userId}/collection/{collectionId}": {
-            "get": {
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
-                "description": "Route that allows searching a collection registered in the system by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Collection"
-                ],
-                "summary": "Search a collection's data by ID",
-                "operationId": "FindByCollectionId",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Collection ID",
-                        "name": "collectionId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerCollectionResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "The user has made a bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "The user is not authorized to make this request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "The user does not have access to this information",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "The user has requested a non-existent resource",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerNotFoundErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "Some entered data could not be processed because it is not valid",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "An unexpected server error has occurred",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerGenericErrorResponse"
-                        }
-                    }
-                }
-            },
             "put": {
                 "security": [
                     {
@@ -422,7 +338,7 @@ const docTemplate = `{
                     "400": {
                         "description": "The user has made a bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
+                            "$ref": "#/definitions/response.SwaggerBadRequestResponse"
                         }
                     },
                     "401": {
@@ -491,12 +407,6 @@ const docTemplate = `{
                     "204": {
                         "description": "Collection successfully deleted"
                     },
-                    "400": {
-                        "description": "The user has made a bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
-                        }
-                    },
                     "401": {
                         "description": "The user is not authorized to make this request",
                         "schema": {
@@ -530,7 +440,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{userId}/collection/{collectionId}/tasks": {
+        "/user/{userId}/collection/{collectionId}/task": {
             "get": {
                 "security": [
                     {
@@ -762,84 +672,6 @@ const docTemplate = `{
             }
         },
         "/user/{userId}/task/{taskId}": {
-            "get": {
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
-                "description": "Route that allows searching a task registered in the system by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Task"
-                ],
-                "summary": "Search a task's data by ID",
-                "operationId": "FindByTaskId",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Task ID",
-                        "name": "taskId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerTaskResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "The user has made a bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "The user is not authorized to make this request",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerUnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "The user does not have access to this information",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "The user has requested a non-existent resource",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerNotFoundErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "Some entered data could not be processed because it is not valid",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerValidationErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "An unexpected server error has occurred",
-                        "schema": {
-                            "$ref": "#/definitions/response.SwaggerGenericErrorResponse"
-                        }
-                    }
-                }
-            },
             "put": {
                 "security": [
                     {
@@ -1076,6 +908,15 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Example Name"
+                }
+            }
+        },
+        "response.SwaggerBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "The request format is invalid."
                 }
             }
         },

@@ -39,6 +39,10 @@ type SwaggerForbiddenResponse struct {
 	Message string `json:"message" example:"Oops! You do not have access to this information."`
 }
 
+type SwaggerBadRequestResponse struct {
+	Message string `json:"message" example:"The request format is invalid."`
+}
+
 type SwaggerValidationErrorResponse struct {
 	Message       string                `json:"error_msg" example:"Some of the data entered is invalid."`
 	InvalidFields []SwaggerInvalidField `json:"invalid_fields"`
