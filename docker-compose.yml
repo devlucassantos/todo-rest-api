@@ -12,18 +12,9 @@ services:
     todo_postgresql:
         container_name: todo_postgresql
         image: lucassantos06/todo-postgresql:${DOCKER_IMAGE_TAG}
-        build:
-            args:
-                POSTGRES_DB: todo_db
-                POSTGRES_SERVICE_USER: todo_service
-                POSTGRES_SERVICE_USER_PASSWORD: todo_service_password
         volumes:
             - todo_data:/var/lib/postgresql/data
         restart: always
-        environment:
-            POSTGRES_DB: todo_db
-            POSTGRES_USER: todo_user
-            POSTGRES_PASSWORD: todo_password
         ports:
             - "5433:5432"
         networks:
