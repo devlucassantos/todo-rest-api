@@ -14,9 +14,6 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
             docker_tag: ${{ steps.generate_tag.outputs.sha }}
-            postgres_db: ${{ secrets.POSTGRES_DB }}
-            postgres_service_user: ${{ secrets.POSTGRES_SERVICE_USER }}
-            postgres_service_user_password: ${{ secrets.POSTGRES_SERVICE_USER_PASSWORD }}
 
         steps:
             - name: Checkout source code
@@ -55,9 +52,9 @@ jobs:
               run: docker push lucassantos06/todo-rest-api:${{ steps.generate_tag.outputs.sha }}
 
             - name: Build Database Docker Image
-              run: docker build --build-arg POSTGRES_DB=${{ needs.build.outputs.postgres_db }} \
-                  --build-arg POSTGRES_SERVICE_USER=${{ needs.build.outputs.postgres_service_user }} \
-                  --build-arg POSTGRES_SERVICE_USER_PASSWORD=${{ needs.build.outputs.postgres_service_user_password }} \
+              run: docker build --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+                  --build-arg POSTGRES_SERVICE_USER=${{ secrets.POSTGRES_SERVICE_USER }} \
+                  --build-arg POSTGRES_SERVICE_USER_PASSWORD=${{ secrets.POSTGRES_SERVICE_USER_PASSWORD }} \
                   -t lucassantos06/todo-postgresql:${{ steps.generate_tag.outputs.sha }} -f Dockerfile-postgres .
 
             - name: Push Database Docker Image
