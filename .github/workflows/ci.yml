@@ -106,7 +106,7 @@ jobs:
                       TAG=${{ needs.build.outputs.docker_tag }}
                       [ -e .env ] && rm .env
                       touch .env
-                      echo "DOCKER_IMAGE_TAG=$TAG" > .env
+                      echo "DOCKER_IMAGE_TAG=$TAG" >> .env
                       docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
                       CONTAINERS=$(docker ps -q)
                       if [ -n "$CONTAINERS" ]; then
