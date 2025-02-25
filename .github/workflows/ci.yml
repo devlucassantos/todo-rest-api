@@ -78,14 +78,23 @@ jobs:
             - name: Checkout source code
               uses: actions/checkout@v4
 
-            - name: Copy docker-compose and .env  file via SSH
+            - name: Copy docker-compose file via SSH
               uses: appleboy/scp-action@v0.1.7
               with:
                   host: ${{ secrets.HOST }}
                   username: ${{ secrets.USER }}
                   password: ${{ secrets.PASSWORD }}
-                  source: "./docker-compose.yml,./.env"
+                  source: "./docker-compose.yml"
                   target: "~/"
+
+            - name: Copy .env file via SSH
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USER }}
+                password: ${{ secrets.PASSWORD }}
+                source: "./.env"
+                target: "~/"
 
             - name: Deploy via SSH
               uses: appleboy/ssh-action@v0.1.3
