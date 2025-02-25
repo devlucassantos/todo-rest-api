@@ -2,6 +2,7 @@ services:
     todo_rest_api:
         container_name: todo_rest_api
         image: lucassantos06/todo-rest-api:${DOCKER_IMAGE_TAG}
+        env_file: .env
         ports:
             - "8000:8000"
         depends_on:
@@ -15,10 +16,7 @@ services:
         volumes:
             - todo_data:/var/lib/postgresql/data
         restart: always
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        env_file: .env
         ports:
             - "5433:5432"
         networks:
@@ -28,8 +26,7 @@ services:
         container_name: todo_postgresql_exporter
         image: prometheuscommunity/postgres-exporter:latest
         platform: linux/arm64
-        environment:
-            DATA_SOURCE_NAME: "postgresql://todo_service:todo_service_password@todo_postgresql:5432/todo_db?sslmode=disable"
+        env_file: .env
         ports:
             - "9187:9187"
         depends_on:
@@ -51,6 +48,7 @@ services:
     todo_grafana:
         container_name: todo_grafana
         image: lucassantos06/todo-grafana:${DOCKER_IMAGE_TAG}
+        env_file: .env
         ports:
             - "3000:3000"
         depends_on:
