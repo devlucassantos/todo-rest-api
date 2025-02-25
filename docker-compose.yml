@@ -1,7 +1,7 @@
 services:
     todo_rest_api:
         container_name: todo_rest_api
-        image: devlucassantos/todo-rest-api:${DOCKER_IMAGE_TAG}
+        image: lucassantos06/todo-rest-api:${DOCKER_IMAGE_TAG}
         ports:
             - "8000:8000"
         depends_on:
@@ -10,7 +10,7 @@ services:
             - todo_network
     todo_postgresql:
         container_name: todo_postgresql
-        image: devlucassantos/todo-postgresql:${DOCKER_IMAGE_TAG}
+        image: lucassantos06/todo-postgresql:${DOCKER_IMAGE_TAG}
         build:
             args:
                 POSTGRES_DB: todo_db
@@ -43,7 +43,7 @@ services:
 
     todo_prometheus:
         container_name: todo_prometheus
-        image: devlucassantos/todo-prometheus:${DOCKER_IMAGE_TAG}
+        image: lucassantos06/todo-prometheus:${DOCKER_IMAGE_TAG}
         ports:
             - "9090:9090"
         depends_on:
@@ -54,7 +54,7 @@ services:
 
     todo_grafana:
         container_name: todo_grafana
-        image: devlucassantos/todo-grafana:${DOCKER_IMAGE_TAG}
+        image: lucassantos06/todo-grafana:${DOCKER_IMAGE_TAG}
         ports:
             - "3000:3000"
         depends_on:
