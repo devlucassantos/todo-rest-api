@@ -8,6 +8,7 @@ services:
             - todo_postgresql
         networks:
             - todo_network
+
     todo_postgresql:
         container_name: todo_postgresql
         image: lucassantos06/todo-postgresql:${DOCKER_IMAGE_TAG}
